@@ -72,61 +72,102 @@ function App() {
   }
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white p-4">
-      <div className="flex justify-center items-center mb-4">
-        <div className="space-x-2">
-          <button
-            className="bg-blue-600 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("chat")}
-          >
-            Bate-Papo
-          </button>
-          <button
-            className="bg-yellow-600 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("radar")}
-          >
-            Radar Social
-          </button>
-          <button
-            className="bg-green-600 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("votacao")}
-          >
-            Votação
-          </button>
-          <button
-            className="bg-purple-600 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("perfil")}
-          >
-            Meu Perfil
-          </button>
-          <button
-            className="bg-pink-600 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("sorteio")}
-          >
-            Sorteio
-          </button>
-          <button
-            className="bg-pink-400 px-3 py-1 rounded"
-            onClick={() => setTelaAtual("paquera")}
-          >
-            Paquera
-          </button>
-          <button
-            className="bg-red-600 px-3 py-1 rounded"
-            onClick={handleLogout}
-          >
-            SAIR
-          </button>
+    <div className="min-h-screen text-white relative">
+      {/* Header futurístico */}
+      <div className="glass-dark border-b border-cyan-500/30 p-4 relative z-10">
+        <div className="flex justify-center items-center mb-4">
+          <h1 className="font-orbitron text-2xl font-bold text-neon mr-4">
+            CHATBAR
+          </h1>
+          <div className="text-sm text-cyan-300">
+            <span className="text-neon-pink">{user.name}</span> • Mesa {user.table}
+          </div>
+        </div>
+
+        {/* Navegação futurística */}
+        <div className="flex justify-center items-center">
+          <div className="glass p-2 rounded-full flex gap-1 flex-wrap justify-center">
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "chat" 
+                  ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
+                  : "text-gray-300 hover:text-cyan-300"
+              }`}
+              onClick={() => setTelaAtual("chat")}
+            >
+              💬 Chat
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "radar" 
+                  ? "bg-yellow-500/30 text-yellow-300 border border-yellow-400/50" 
+                  : "text-gray-300 hover:text-yellow-300"
+              }`}
+              onClick={() => setTelaAtual("radar")}
+            >
+              📡 Radar
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "votacao" 
+                  ? "bg-green-500/30 text-green-300 border border-green-400/50" 
+                  : "text-gray-300 hover:text-green-300"
+              }`}
+              onClick={() => setTelaAtual("votacao")}
+            >
+              🎵 Votação
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "perfil" 
+                  ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
+                  : "text-gray-300 hover:text-purple-300"
+              }`}
+              onClick={() => setTelaAtual("perfil")}
+            >
+              👤 Perfil
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "sorteio" 
+                  ? "bg-pink-500/30 text-pink-300 border border-pink-400/50" 
+                  : "text-gray-300 hover:text-pink-300"
+              }`}
+              onClick={() => setTelaAtual("sorteio")}
+            >
+              🎁 Sorteio
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+                telaAtual === "paquera" 
+                  ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
+                  : "text-gray-300 hover:text-rose-300"
+              }`}
+              onClick={() => setTelaAtual("paquera")}
+            >
+              💘 Paquera
+            </button>
+            <button
+              className="px-4 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30"
+              onClick={handleLogout}
+            >
+              🚪 Sair
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Exibe a tela selecionada */}
-      {telaAtual === "chat" && <ChatRoom user={user} />}
-      {telaAtual === "votacao" && <Votacao user={user} />}
-      {telaAtual === "radar" && <RadarSocial user={user} />}
-      {telaAtual === "sorteio" && <Sorteio user={user} />}
-      {telaAtual === "perfil" && (<Profile user={user} onBack={() => setTelaAtual("chat")}/>)}
-      {telaAtual === "paquera" && <Paquera user={user} />}
+      {/* Conteúdo principal */}
+      <div className="p-4 relative z-10">
+        {telaAtual === "chat" && <ChatRoom user={user} />}
+        {telaAtual === "votacao" && <Votacao user={user} />}
+        {telaAtual === "radar" && <RadarSocial user={user} />}
+        {telaAtual === "sorteio" && <Sorteio user={user} />}
+        {telaAtual === "perfil" && (<Profile user={user} onBack={() => setTelaAtual("chat")}/>)}
+        {telaAtual === "paquera" && <Paquera user={user} />}
+      </div>
+
+      {/* Notificações */}
       <Notificacoes user={user} />
     </div>
   );

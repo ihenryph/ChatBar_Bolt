@@ -96,122 +96,173 @@ export default function Paquera({ user }) {
   const getStatusColor = (status) => {
     switch (status) {
       case "Solteiro":
-        return "border-green-500 bg-green-900/20";
+        return "border-green-400/50 bg-green-900/20";
       case "Comprometido":
-        return "border-yellow-500 bg-yellow-900/20";
+        return "border-yellow-400/50 bg-yellow-900/20";
       case "Casado":
-        return "border-red-500 bg-red-900/20";
+        return "border-red-400/50 bg-red-900/20";
       default:
-        return "border-gray-500 bg-gray-900/20";
+        return "border-gray-400/50 bg-gray-900/20";
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-gray-800 p-4 rounded shadow space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold">💘 Modo Paquera</h2>
-        <p className="text-gray-300 text-sm mt-1">
-          Curta perfis anonimamente e descubra se deu match!
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="glass-dark rounded-2xl p-6 text-center">
+        <h2 className="font-orbitron text-3xl font-bold text-neon-pink mb-3">
+          MODO PAQUERA
+        </h2>
+        <p className="text-gray-300 font-mono">
+          Sistema de Conexões Românticas • Protocolo Anônimo Ativo
         </p>
       </div>
 
       {/* Matches */}
       {matches.length > 0 && (
-        <div className="bg-gradient-to-r from-pink-600 to-purple-600 p-4 rounded-lg text-center animate-pulse">
-          <h3 className="text-xl font-bold mb-2">🔥 Deu Match!</h3>
-          <div className="space-y-1">
-            {matches.map((nome, idx) => (
-              <p key={idx} className="text-lg">💑 Você combinou com <strong>{nome}</strong>!</p>
-            ))}
+        <div className="glass rounded-2xl p-6 border-2 border-pink-400/50 bg-gradient-to-r from-pink-900/30 to-purple-900/30 hologram">
+          <div className="text-center">
+            <h3 className="font-orbitron text-2xl font-bold text-neon-pink mb-4 animate-pulse">
+              🔥 CONEXÃO ESTABELECIDA!
+            </h3>
+            <div className="space-y-2">
+              {matches.map((nome, idx) => (
+                <div key={idx} className="glass-blue p-4 rounded-xl">
+                  <p className="text-lg font-semibold">
+                    💑 Match confirmado com <span className="text-neon-pink">{nome}</span>!
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Lista de usuários */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {usuarios.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-400 mb-2">Nenhum outro usuário online.</p>
-            <p className="text-gray-500 text-sm">Aguarde outros usuários entrarem no chat!</p>
+          <div className="glass-dark rounded-2xl p-12 text-center">
+            <div className="text-8xl mb-6 opacity-30">💘</div>
+            <h3 className="font-orbitron text-xl text-gray-400 mb-2">
+              RADAR DE PAQUERA VAZIO
+            </h3>
+            <p className="text-gray-500 font-mono">
+              Aguardando outras entidades se conectarem...
+            </p>
           </div>
         ) : (
           <>
-            <div className="text-center mb-4">
-              <p className="text-gray-300 text-sm">
-                {usuarios.length} {usuarios.length === 1 ? 'pessoa disponível' : 'pessoas disponíveis'} para paquera
+            <div className="glass-dark rounded-xl p-4 text-center">
+              <p className="text-cyan-300 font-mono">
+                {usuarios.length} {usuarios.length === 1 ? 'ENTIDADE DETECTADA' : 'ENTIDADES DETECTADAS'} PARA CONEXÃO
               </p>
             </div>
             
-            {usuarios.map((u, idx) => {
-              const jaCurtiu = curtidasFeitas.includes(u.name);
-              const recebeuCurtida = curtidasRecebidas.includes(u.name);
-              const isMatch = matches.includes(u.name);
-              
-              return (
-                <div
-                  key={`${u.name}-${u.table}`}
-                  className={`p-4 rounded-lg border-2 transition-all duration-300 ${
-                    isMatch 
-                      ? "border-pink-500 bg-pink-900/30 shadow-lg" 
-                      : getStatusColor(u.status)
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-lg">{u.name}</span>
-                        <span className="text-sm bg-gray-700 px-2 py-1 rounded">
-                          Mesa {u.table}
-                        </span>
-                        {isMatch && (
-                          <span className="text-xs bg-pink-600 px-2 py-1 rounded animate-pulse">
-                            MATCH!
+            <div className="grid gap-4 md:grid-cols-2">
+              {usuarios.map((u, idx) => {
+                const jaCurtiu = curtidasFeitas.includes(u.name);
+                const recebeuCurtida = curtidasRecebidas.includes(u.name);
+                const isMatch = matches.includes(u.name);
+                
+                return (
+                  <div
+                    key={`${u.name}-${u.table}`}
+                    className={`glass-dark rounded-2xl p-6 border-2 transition-all duration-500 hover-glow relative overflow-hidden ${
+                      isMatch 
+                        ? "border-pink-400/50 bg-pink-900/30 hologram" 
+                        : getStatusColor(u.status)
+                    }`}
+                  >
+                    {/* Efeito de scan para matches */}
+                    {isMatch && (
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent animate-pulse"></div>
+                    )}
+                    
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-orbitron text-lg font-bold text-white">
+                            {u.name}
                           </span>
+                          <div className="glass px-3 py-1 rounded-full text-xs font-mono">
+                            SETOR {u.table}
+                          </div>
+                          {isMatch && (
+                            <div className="bg-pink-500/30 px-2 py-1 rounded-full text-xs font-bold text-pink-300 border border-pink-400/50 animate-pulse">
+                              MATCH!
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center gap-3 text-sm mb-3">
+                          <span className="text-2xl">{getStatusIcon(u.status)}</span>
+                          <span className="text-gray-300 font-mono">{u.status || "Status não informado"}</span>
+                        </div>
+
+                        {recebeuCurtida && !isMatch && (
+                          <div className="glass-blue p-2 rounded-lg mb-3">
+                            <span className="text-sm text-pink-300 font-mono">
+                              💖 ESTA ENTIDADE TE CURTIU!
+                            </span>
+                          </div>
                         )}
                       </div>
                       
-                      <div className="flex items-center gap-2 text-sm mb-2">
-                        <span>{getStatusIcon(u.status)}</span>
-                        <span className="text-gray-300">{u.status || "Status não informado"}</span>
-                      </div>
-
-                      {recebeuCurtida && !isMatch && (
-                        <div className="text-sm text-pink-400 mb-2">
-                          💖 Esta pessoa te curtiu!
+                      <div className="flex flex-col items-center gap-3">
+                        <button
+                          onClick={() => handleCurtir(u.name)}
+                          disabled={jaCurtiu}
+                          className={`px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 relative overflow-hidden ${
+                            jaCurtiu
+                              ? "bg-gray-600/50 cursor-not-allowed text-gray-400 border border-gray-500/30"
+                              : isMatch
+                              ? "btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 animate-pulse"
+                              : recebeuCurtida
+                              ? "btn-futuristic bg-gradient-to-r from-purple-600 to-pink-600"
+                              : "btn-futuristic"
+                          }`}
+                        >
+                          {jaCurtiu ? "💖 ENVIADO" : recebeuCurtida ? "💜 RETRIBUIR" : "💖 CURTIR"}
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                          <span className="text-xs text-green-300 font-mono">ONLINE</span>
                         </div>
-                      )}
+                      </div>
                     </div>
-                    
-                    <div className="flex flex-col items-center gap-2">
-                      <button
-                        onClick={() => handleCurtir(u.name)}
-                        disabled={jaCurtiu}
-                        className={`px-4 py-2 rounded-full transition-all duration-300 ${
-                          jaCurtiu
-                            ? "bg-gray-500 cursor-not-allowed text-gray-300"
-                            : isMatch
-                            ? "bg-pink-600 hover:bg-pink-700 text-white animate-pulse"
-                            : recebeuCurtida
-                            ? "bg-purple-600 hover:bg-purple-700 text-white"
-                            : "bg-pink-600 hover:bg-pink-700 text-white"
-                        }`}
-                      >
-                        {jaCurtiu ? "💖 Curtido" : recebeuCurtida ? "💜 Curtir de volta" : "💖 Curtir"}
-                      </button>
-                      
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+
+                    {/* Barra de compatibilidade (simulada) */}
+                    <div className="flex items-center gap-2 mt-4">
+                      <span className="text-xs text-gray-400 font-mono">COMPATIBILIDADE:</span>
+                      <div className="flex-1 bg-gray-700 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            isMatch ? 'bg-gradient-to-r from-pink-500 to-purple-500' :
+                            recebeuCurtida ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
+                            'bg-gradient-to-r from-blue-500 to-cyan-500'
+                          }`}
+                          style={{ 
+                            width: `${isMatch ? 100 : recebeuCurtida ? 85 : Math.floor(Math.random() * 40) + 60}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-cyan-300 font-mono">
+                        {isMatch ? '100%' : recebeuCurtida ? '85%' : `${Math.floor(Math.random() * 40) + 60}%`}
+                      </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </>
         )}
       </div>
 
-      <div className="mt-4 p-3 bg-gray-700 rounded text-center">
-        <p className="text-xs text-gray-400">
-          💡 Dica: As curtidas são anônimas até dar match!
+      {/* Footer informativo */}
+      <div className="glass-dark rounded-2xl p-4 text-center">
+        <p className="text-xs text-gray-400 font-mono">
+          💡 SISTEMA ANÔNIMO • CURTIDAS SÓ SÃO REVELADAS EM CASO DE MATCH
         </p>
       </div>
     </div>

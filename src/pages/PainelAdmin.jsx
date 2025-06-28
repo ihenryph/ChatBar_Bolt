@@ -1,5 +1,3 @@
-//NOVO PROJETO SEM CHAT
-
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy } from "firebase/firestore";
@@ -174,112 +172,188 @@ export default function PainelAdmin() {
   const usuariosComprometidos = usuarios.filter(u => u.status === "Comprometido" || u.status === "Casado").length;
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white p-4">
-      <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Painel do Administrador</h1>
-        <button
-          className="bg-red-600 px-4 py-2 rounded"
-          onClick={() => window.location.reload()}
-        >
-          Sair
-        </button>
+    <div className="min-h-screen text-white relative">
+      {/* Efeito de partículas de fundo */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-40"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${4 + Math.random() * 3}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Header Administrativo */}
+      <header className="glass-dark border-b border-red-500/30 p-6 relative z-10">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="font-orbitron text-3xl font-bold text-neon mb-2">
+              PAINEL DE CONTROLE
+            </h1>
+            <p className="text-red-300 font-mono text-sm">
+              SISTEMA ADMINISTRATIVO • ACESSO RESTRITO
+            </p>
+          </div>
+          <button
+            className="btn-futuristic bg-gradient-to-r from-red-600 to-pink-600 px-6 py-3 rounded-xl font-bold"
+            onClick={() => window.location.reload()}
+          >
+            🚪 DESCONECTAR
+          </button>
+        </div>
       </header>
 
-      <nav className="flex gap-2 mb-6 flex-wrap">
-        <button
-          className={`px-4 py-2 rounded ${tela === "home" ? "bg-blue-600" : "bg-gray-700"}`}
-          onClick={() => setTela("home")}
-        >
-          Visão Geral
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${tela === "votacao" ? "bg-blue-600" : "bg-gray-700"}`}
-          onClick={() => setTela("votacao")}
-        >
-          Votação
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${tela === "sorteio" ? "bg-blue-600" : "bg-gray-700"}`}
-          onClick={() => setTela("sorteio")}
-        >
-          Sorteio
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${tela === "radar" ? "bg-blue-600" : "bg-gray-700"}`}
-          onClick={() => setTela("radar")}
-        >
-          Radar Social
-        </button>
+      {/* Navegação */}
+      <nav className="glass p-4 m-6 rounded-2xl relative z-10">
+        <div className="flex gap-2 flex-wrap justify-center">
+          {[
+            { id: "home", label: "📊 VISÃO GERAL", color: "blue" },
+            { id: "votacao", label: "🎵 VOTAÇÃO", color: "green" },
+            { id: "sorteio", label: "🎁 SORTEIO", color: "yellow" },
+            { id: "radar", label: "📡 RADAR", color: "purple" }
+          ].map((item) => (
+            <button
+              key={item.id}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 hover-glow ${
+                tela === item.id 
+                  ? `bg-${item.color}-500/30 text-${item.color}-300 border border-${item.color}-400/50` 
+                  : "text-gray-300 hover:text-white"
+              }`}
+              onClick={() => setTela(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </nav>
 
-      <section className="space-y-6">
+      {/* Conteúdo Principal */}
+      <section className="p-6 space-y-6 relative z-10">
         {tela === "home" && (
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* 👥 Clientes Online (dados reais) */}
-            <div className="bg-gray-800 p-4 rounded shadow">
-              <h2 className="text-xl font-bold mb-2">👥 Clientes Online</h2>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Clientes Online */}
+            <div className="glass-dark rounded-2xl p-6 border border-cyan-500/30">
+              <h2 className="font-orbitron text-xl font-bold text-neon mb-4 flex items-center gap-2">
+                👥 ENTIDADES CONECTADAS
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              </h2>
               {usuarios.length === 0 ? (
-                <p className="text-gray-400">Nenhum usuário logado.</p>
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-2 opacity-30">👤</div>
+                  <p className="text-gray-400 font-mono">NENHUMA ENTIDADE DETECTADA</p>
+                </div>
               ) : (
-                <ul className="list-disc list-inside text-gray-300">
+                <div className="space-y-3 max-h-80 overflow-y-auto">
                   {usuarios.map((u, idx) => (
-                    <div key={idx} className="p-2 border-b border-gray-700">
-                      <p><strong>Nome:</strong> {u.name}</p>
-                      <p><strong>Mesa:</strong> {u.table}</p>
-                      <p><strong>Status:</strong> {u.status}</p>
-                      <p><strong>Hora:</strong> {u.timestamp?.toDate?.().toLocaleTimeString() || 'N/A'}</p>
+                    <div key={idx} className="glass p-4 rounded-xl border border-gray-600/30">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-semibold text-cyan-300">{u.name}</span>
+                        <div className="glass px-2 py-1 rounded-full text-xs">
+                          SETOR {u.table}
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-300 space-y-1">
+                        <p><span className="text-gray-400">STATUS:</span> {u.status}</p>
+                        <p><span className="text-gray-400">CONEXÃO:</span> {u.timestamp?.toDate?.().toLocaleTimeString() || 'N/A'}</p>
+                      </div>
                     </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
 
-            <div className="bg-gray-800 p-4 rounded shadow">
-              <h2 className="text-xl font-bold mb-2">📊 Estatísticas Gerais</h2>
-              <div className="space-y-2 text-gray-300">
-                <p>💬 Total de mensagens: {totalMensagens}</p>
-                <p>💖 Total de curtidas: {totalCurtidas}</p>
-                <p>💚 Solteiros: {usuariosSolteiros}</p>
-                <p>💙 Comprometidos: {usuariosComprometidos}</p>
+            {/* Estatísticas Gerais */}
+            <div className="glass-dark rounded-2xl p-6 border border-purple-500/30">
+              <h2 className="font-orbitron text-xl font-bold text-neon-pink mb-4">
+                📊 MÉTRICAS DO SISTEMA
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="glass-blue p-4 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-blue-300">{totalMensagens}</div>
+                  <div className="text-sm text-blue-200 font-mono">TRANSMISSÕES</div>
+                </div>
+                <div className="glass p-4 rounded-xl text-center bg-pink-900/20 border border-pink-500/30">
+                  <div className="text-3xl font-bold text-pink-300">{totalCurtidas}</div>
+                  <div className="text-sm text-pink-200 font-mono">CONEXÕES</div>
+                </div>
+                <div className="glass p-4 rounded-xl text-center bg-green-900/20 border border-green-500/30">
+                  <div className="text-3xl font-bold text-green-300">{usuariosSolteiros}</div>
+                  <div className="text-sm text-green-200 font-mono">DISPONÍVEIS</div>
+                </div>
+                <div className="glass p-4 rounded-xl text-center bg-yellow-900/20 border border-yellow-500/30">
+                  <div className="text-3xl font-bold text-yellow-300">{usuariosComprometidos}</div>
+                  <div className="text-sm text-yellow-200 font-mono">VINCULADOS</div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-800 p-4 rounded shadow">
-              <h2 className="text-xl font-bold mb-2">🎁 Sorteio</h2>
-              <p className="text-gray-300">Participantes: {sorteioData.participantes.length}</p>
-              {sorteioData.ganhador && (
-                <p className="text-green-400 mt-1">
-                  🏆 Ganhador: {sorteioData.ganhador.name} (Mesa {sorteioData.ganhador.table})
-                </p>
-              )}
-              <div className="mt-2 space-x-2">
-                <button 
-                  className="bg-green-600 px-4 py-1 rounded hover:bg-green-700"
-                  onClick={handleSortear}
-                >
-                  Sortear agora
-                </button>
-                <button 
-                  className="bg-red-600 px-4 py-1 rounded hover:bg-red-700"
-                  onClick={handleReiniciarSorteio}
-                >
-                  Reiniciar Sorteio
-                </button>
+            {/* Controle de Sorteio */}
+            <div className="glass-dark rounded-2xl p-6 border border-yellow-500/30">
+              <h2 className="font-orbitron text-xl font-bold text-yellow-300 mb-4">
+                🎁 SISTEMA DE SORTEIO
+              </h2>
+              <div className="space-y-4">
+                <div className="glass p-4 rounded-xl">
+                  <p className="text-gray-300 font-mono">
+                    PARTICIPANTES: <span className="text-yellow-300 font-bold">{sorteioData.participantes.length}</span>
+                  </p>
+                  {sorteioData.ganhador && (
+                    <div className="mt-2 glass-blue p-3 rounded-lg">
+                      <p className="text-green-300 font-mono">
+                        🏆 VENCEDOR: {sorteioData.ganhador.name} (SETOR {sorteioData.ganhador.table})
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <button 
+                    className="btn-futuristic bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 rounded-xl flex-1"
+                    onClick={handleSortear}
+                  >
+                    🎲 EXECUTAR SORTEIO
+                  </button>
+                  <button 
+                    className="btn-futuristic bg-gradient-to-r from-red-600 to-pink-600 px-4 py-2 rounded-xl flex-1"
+                    onClick={handleReiniciarSorteio}
+                  >
+                    🔄 REINICIAR
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-800 p-4 rounded shadow">
-              <h2 className="text-xl font-bold mb-2">🔥 Top 3 Mesas Ativas</h2>
+            {/* Top 3 Mesas */}
+            <div className="glass-dark rounded-2xl p-6 border border-orange-500/30">
+              <h2 className="font-orbitron text-xl font-bold text-orange-300 mb-4">
+                🔥 SETORES MAIS ATIVOS
+              </h2>
               {mesasAtivas.length === 0 ? (
-                <p className="text-gray-400">Nenhuma atividade registrada.</p>
+                <p className="text-gray-400 font-mono text-center py-4">NENHUMA ATIVIDADE DETECTADA</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {mesasAtivas.slice(0, 3).map((mesa, idx) => (
-                    <div key={mesa.mesa} className="flex items-center justify-between">
-                      <span className="text-gray-300">
-                        {idx === 0 && "🥇"} {idx === 1 && "🥈"} {idx === 2 && "🥉"} Mesa {mesa.mesa}
-                      </span>
-                      <span className="text-yellow-400 font-bold">{mesa.atividade} pts</span>
+                    <div key={mesa.mesa} className="glass p-4 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">
+                          {idx === 0 && "🥇"} {idx === 1 && "🥈"} {idx === 2 && "🥉"}
+                        </span>
+                        <span className="font-mono text-gray-300">SETOR {mesa.mesa}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="h-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500"
+                            style={{ width: `${(mesa.atividade / maxAtividade) * 100}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-orange-400 font-bold font-mono">{mesa.atividade}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -289,60 +363,79 @@ export default function PainelAdmin() {
         )}
 
         {tela === "votacao" && (
-          <div className="bg-gray-800 p-6 rounded shadow">
-            <h2 className="text-xl font-bold mb-4">📊 Controle de Votação</h2>
-            <p>Implementaremos aqui o monitoramento de votos em tempo real.</p>
+          <div className="glass-dark rounded-2xl p-8 border border-green-500/30">
+            <h2 className="font-orbitron text-2xl font-bold text-green-300 mb-6 text-center">
+              🎵 SISTEMA DE VOTAÇÃO
+            </h2>
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4 opacity-30">🎵</div>
+              <p className="text-gray-400 font-mono">MÓDULO EM DESENVOLVIMENTO</p>
+              <p className="text-gray-500 text-sm mt-2">Monitoramento de votos será implementado aqui</p>
+            </div>
           </div>
         )}
 
         {tela === "sorteio" && (
-          <div className="bg-gray-800 p-6 rounded shadow">
-            <h2 className="text-xl font-bold mb-4">🎁 Gerenciar Sorteios</h2>
-            
-            <div className="space-y-4">
-              <div className="bg-gray-700 p-4 rounded">
-                <h3 className="text-lg font-semibold mb-2">Status do Sorteio</h3>
-                <p className="text-gray-300">Participantes: {sorteioData.participantes.length}</p>
-                
-                {sorteioData.ganhador ? (
-                  <div className="mt-2 p-3 bg-green-800 rounded">
-                    <p className="text-green-200">
-                      🏆 Ganhador: {sorteioData.ganhador.name} (Mesa {sorteioData.ganhador.table})
+          <div className="space-y-6">
+            <div className="glass-dark rounded-2xl p-8 border border-yellow-500/30">
+              <h2 className="font-orbitron text-2xl font-bold text-yellow-300 mb-6 text-center">
+                🎁 GERENCIAMENTO DE SORTEIOS
+              </h2>
+              
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Status do Sorteio */}
+                <div className="glass p-6 rounded-xl border border-gray-600/30">
+                  <h3 className="font-orbitron text-lg font-semibold mb-4 text-cyan-300">STATUS ATUAL</h3>
+                  <div className="space-y-3">
+                    <p className="text-gray-300 font-mono">
+                      PARTICIPANTES: <span className="text-yellow-300 font-bold">{sorteioData.participantes.length}</span>
                     </p>
+                    
+                    {sorteioData.ganhador ? (
+                      <div className="glass-blue p-4 rounded-lg border border-green-500/30">
+                        <p className="text-green-300 font-mono">
+                          🏆 VENCEDOR SELECIONADO:<br/>
+                          <span className="text-white font-bold">{sorteioData.ganhador.name}</span> (SETOR {sorteioData.ganhador.table})
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 font-mono">AGUARDANDO EXECUÇÃO</p>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-gray-400 mt-2">Nenhum ganhador ainda</p>
-                )}
+                </div>
+
+                {/* Lista de Participantes */}
+                <div className="glass p-6 rounded-xl border border-gray-600/30">
+                  <h3 className="font-orbitron text-lg font-semibold mb-4 text-cyan-300">ENTIDADES REGISTRADAS</h3>
+                  {sorteioData.participantes.length === 0 ? (
+                    <p className="text-gray-400 font-mono text-center py-4">NENHUM PARTICIPANTE</p>
+                  ) : (
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {sorteioData.participantes.map((p, i) => (
+                        <div key={i} className="glass p-3 rounded-lg flex items-center justify-between">
+                          <span className="text-gray-300 font-mono">🧑 {p.name}</span>
+                          <span className="text-cyan-300 text-sm">SETOR {p.table}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="bg-gray-700 p-4 rounded">
-                <h3 className="text-lg font-semibold mb-2">Lista de Participantes</h3>
-                {sorteioData.participantes.length === 0 ? (
-                  <p className="text-gray-400">Nenhum participante ainda.</p>
-                ) : (
-                  <ul className="space-y-1">
-                    {sorteioData.participantes.map((p, i) => (
-                      <li key={i} className="text-gray-300">
-                        🧑 {p.name} (Mesa {p.table})
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <div className="flex gap-2">
+              {/* Controles */}
+              <div className="flex gap-4 mt-6 justify-center">
                 <button 
-                  className="bg-green-600 px-6 py-2 rounded hover:bg-green-700"
+                  className="btn-futuristic bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-4 rounded-xl font-bold disabled:opacity-50"
                   onClick={handleSortear}
                   disabled={sorteioData.participantes.length === 0}
                 >
-                  Realizar Sorteio
+                  🎲 EXECUTAR SORTEIO
                 </button>
                 <button 
-                  className="bg-red-600 px-6 py-2 rounded hover:bg-red-700"
+                  className="btn-futuristic bg-gradient-to-r from-red-600 to-pink-600 px-8 py-4 rounded-xl font-bold"
                   onClick={handleReiniciarSorteio}
                 >
-                  Reiniciar Sorteio
+                  🔄 REINICIAR SISTEMA
                 </button>
               </div>
             </div>
@@ -351,49 +444,59 @@ export default function PainelAdmin() {
 
         {tela === "radar" && (
           <div className="space-y-6">
-            {/* Gráfico de Mesas Mais Movimentadas */}
-            <div className="bg-gray-800 p-6 rounded shadow">
-              <h2 className="text-xl font-bold mb-4">🔥 Mesas Mais Movimentadas</h2>
+            {/* Mesas Mais Movimentadas */}
+            <div className="glass-dark rounded-2xl p-8 border border-purple-500/30">
+              <h2 className="font-orbitron text-2xl font-bold text-purple-300 mb-6 text-center">
+                🔥 ANÁLISE DE ATIVIDADE POR SETOR
+              </h2>
               
               {mesasAtivas.length === 0 ? (
-                <p className="text-gray-400">Nenhuma atividade registrada ainda.</p>
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4 opacity-30">📊</div>
+                  <p className="text-gray-400 font-mono">NENHUMA ATIVIDADE REGISTRADA</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {mesasAtivas.map((mesa, idx) => (
-                    <div key={mesa.mesa} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold">Mesa {mesa.mesa}</span>
-                        <span className="text-yellow-400">{mesa.atividade} pontos</span>
+                    <div key={mesa.mesa} className="glass p-6 rounded-xl border border-gray-600/30">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-orbitron font-bold text-white">SETOR {mesa.mesa}</span>
+                          {idx < 3 && (
+                            <span className="text-2xl">
+                              {idx === 0 && "🥇"} {idx === 1 && "🥈"} {idx === 2 && "🥉"}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-yellow-400 font-bold font-mono">{mesa.atividade} PONTOS</span>
                       </div>
                       
-                      {/* Barra de progresso visual */}
-                      <div className="w-full bg-gray-700 rounded-full h-4">
+                      {/* Barra de progresso */}
+                      <div className="w-full bg-gray-700 rounded-full h-4 mb-3">
                         <div 
-                          className={`h-4 rounded-full transition-all duration-500 ${
-                            idx === 0 ? 'bg-red-500' : 
-                            idx === 1 ? 'bg-orange-500' : 
-                            idx === 2 ? 'bg-yellow-500' : 
-                            'bg-blue-500'
+                          className={`h-4 rounded-full transition-all duration-1000 ${
+                            idx === 0 ? 'bg-gradient-to-r from-red-500 to-orange-500' : 
+                            idx === 1 ? 'bg-gradient-to-r from-orange-500 to-yellow-500' : 
+                            idx === 2 ? 'bg-gradient-to-r from-yellow-500 to-green-500' : 
+                            'bg-gradient-to-r from-blue-500 to-purple-500'
                           }`}
-                          style={{ 
-                            width: `${(mesa.atividade / maxAtividade) * 100}%` 
-                          }}
+                          style={{ width: `${(mesa.atividade / maxAtividade) * 100}%` }}
                         ></div>
                       </div>
                       
                       {/* Indicador de calor */}
                       <div className="flex items-center gap-2 text-sm">
-                        <span>🌡️ Nível de atividade:</span>
-                        <span className={`font-bold ${
+                        <span className="text-gray-400 font-mono">NÍVEL DE ATIVIDADE:</span>
+                        <span className={`font-bold font-mono ${
                           mesa.atividade >= maxAtividade * 0.8 ? 'text-red-400' :
                           mesa.atividade >= maxAtividade * 0.5 ? 'text-orange-400' :
                           mesa.atividade >= maxAtividade * 0.3 ? 'text-yellow-400' :
                           'text-blue-400'
                         }`}>
-                          {mesa.atividade >= maxAtividade * 0.8 ? 'MUITO QUENTE 🔥' :
-                           mesa.atividade >= maxAtividade * 0.5 ? 'QUENTE 🌶️' :
-                           mesa.atividade >= maxAtividade * 0.3 ? 'MORNO 🌤️' :
-                           'FRIO ❄️'}
+                          {mesa.atividade >= maxAtividade * 0.8 ? 'CRÍTICO 🔥' :
+                           mesa.atividade >= maxAtividade * 0.5 ? 'ALTO 🌶️' :
+                           mesa.atividade >= maxAtividade * 0.3 ? 'MÉDIO 🌤️' :
+                           'BAIXO ❄️'}
                         </span>
                       </div>
                     </div>
@@ -403,37 +506,42 @@ export default function PainelAdmin() {
             </div>
 
             {/* Perfis Mais Ativos */}
-            <div className="bg-gray-800 p-6 rounded shadow">
-              <h2 className="text-xl font-bold mb-4">👑 Perfis Mais Ativos</h2>
+            <div className="glass-dark rounded-2xl p-8 border border-cyan-500/30">
+              <h2 className="font-orbitron text-2xl font-bold text-cyan-300 mb-6 text-center">
+                👑 RANKING DE ENTIDADES ATIVAS
+              </h2>
               
               {perfisAtivos.length === 0 ? (
-                <p className="text-gray-400">Nenhuma atividade registrada ainda.</p>
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4 opacity-30">👤</div>
+                  <p className="text-gray-400 font-mono">NENHUMA ATIVIDADE REGISTRADA</p>
+                </div>
               ) : (
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   {perfisAtivos.map((perfil, idx) => (
-                    <div key={perfil.nome} className="bg-gray-700 p-4 rounded border-l-4 border-blue-500">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
+                    <div key={perfil.nome} className="glass p-6 rounded-xl border-l-4 border-cyan-500">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
                           {idx < 3 && (
-                            <span className="text-lg">
+                            <span className="text-2xl">
                               {idx === 0 && "👑"} {idx === 1 && "🥈"} {idx === 2 && "🥉"}
                             </span>
                           )}
-                          <span className="font-semibold">{perfil.nome}</span>
+                          <span className="font-orbitron font-semibold text-white">{perfil.nome}</span>
                         </div>
-                        <span className="bg-blue-600 px-2 py-1 rounded text-sm">
-                          {perfil.atividade} pts
-                        </span>
+                        <div className="glass-blue px-3 py-1 rounded-full text-sm font-mono">
+                          {perfil.atividade} PTS
+                        </div>
                       </div>
                       
-                      <div className="text-sm text-gray-300 space-y-1">
-                        <p>📍 Mesa: {perfil.mesa}</p>
-                        <p>💝 Status: {perfil.status}</p>
-                        <div className="flex items-center gap-1">
-                          <span>⚡ Atividade:</span>
+                      <div className="text-sm text-gray-300 space-y-2">
+                        <p><span className="text-gray-400">SETOR:</span> {perfil.mesa}</p>
+                        <p><span className="text-gray-400">STATUS:</span> {perfil.status}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400">ATIVIDADE:</span>
                           <div className="flex-1 bg-gray-600 rounded-full h-2">
                             <div 
-                              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-1000"
                               style={{ 
                                 width: `${Math.min((perfil.atividade / Math.max(...perfisAtivos.map(p => p.atividade))) * 100, 100)}%` 
                               }}
@@ -448,42 +556,44 @@ export default function PainelAdmin() {
             </div>
 
             {/* Resumo da Atividade Social */}
-            <div className="bg-gray-800 p-6 rounded shadow">
-              <h2 className="text-xl font-bold mb-4">📊 Resumo da Atividade Social</h2>
+            <div className="glass-dark rounded-2xl p-8 border border-green-500/30">
+              <h2 className="font-orbitron text-2xl font-bold text-green-300 mb-6 text-center">
+                📊 ANÁLISE COMPORTAMENTAL DO AMBIENTE
+              </h2>
               
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="bg-blue-900 p-4 rounded text-center">
-                  <div className="text-2xl font-bold text-blue-300">{totalMensagens}</div>
-                  <div className="text-sm text-blue-200">Mensagens Enviadas</div>
+              <div className="grid gap-6 md:grid-cols-3 mb-6">
+                <div className="glass-blue p-6 rounded-xl text-center">
+                  <div className="text-4xl font-bold text-blue-300 font-mono">{totalMensagens}</div>
+                  <div className="text-sm text-blue-200 font-mono">TRANSMISSÕES TOTAIS</div>
                 </div>
                 
-                <div className="bg-pink-900 p-4 rounded text-center">
-                  <div className="text-2xl font-bold text-pink-300">{totalCurtidas}</div>
-                  <div className="text-sm text-pink-200">Curtidas Trocadas</div>
+                <div className="glass p-6 rounded-xl text-center bg-pink-900/20 border border-pink-500/30">
+                  <div className="text-4xl font-bold text-pink-300 font-mono">{totalCurtidas}</div>
+                  <div className="text-sm text-pink-200 font-mono">CONEXÕES ROMÂNTICAS</div>
                 </div>
                 
-                <div className="bg-green-900 p-4 rounded text-center">
-                  <div className="text-2xl font-bold text-green-300">{usuarios.length}</div>
-                  <div className="text-sm text-green-200">Usuários Ativos</div>
+                <div className="glass p-6 rounded-xl text-center bg-green-900/20 border border-green-500/30">
+                  <div className="text-4xl font-bold text-green-300 font-mono">{usuarios.length}</div>
+                  <div className="text-sm text-green-200 font-mono">ENTIDADES ATIVAS</div>
                 </div>
               </div>
 
-              <div className="mt-4 p-4 bg-gray-700 rounded">
-                <h3 className="font-semibold mb-2">🎯 Insights do Ambiente</h3>
-                <ul className="text-sm text-gray-300 space-y-1">
+              <div className="glass p-6 rounded-xl border border-gray-600/30">
+                <h3 className="font-orbitron font-semibold mb-4 text-cyan-300">🎯 INSIGHTS DO AMBIENTE</h3>
+                <div className="space-y-2 text-sm text-gray-300 font-mono">
                   {mesasAtivas.length > 0 && (
-                    <li>🔥 Mesa {mesasAtivas[0].mesa} está dominando as conversas!</li>
+                    <p>🔥 SETOR {mesasAtivas[0].mesa} está dominando as comunicações!</p>
                   )}
                   {perfisAtivos.length > 0 && (
-                    <li>👑 {perfisAtivos[0].nome} é o usuário mais ativo da noite</li>
+                    <p>👑 {perfisAtivos[0].nome} é a entidade mais ativa do ambiente</p>
                   )}
                   {usuariosSolteiros > usuariosComprometidos && (
-                    <li>💚 Ambiente com mais solteiros - clima de paquera!</li>
+                    <p>💚 Ambiente com predominância de entidades disponíveis - clima propício para conexões!</p>
                   )}
                   {totalCurtidas > totalMensagens * 0.3 && (
-                    <li>💖 Muita interação romântica rolando!</li>
+                    <p>💖 Alto índice de interações românticas detectado!</p>
                   )}
-                </ul>
+                </div>
               </div>
             </div>
           </div>

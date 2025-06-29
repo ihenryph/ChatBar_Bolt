@@ -9,12 +9,14 @@ import {
   onSnapshot,
   serverTimestamp,
 } from "firebase/firestore";
+import ChatPrivado from "./ChatPrivado";
 
 export default function Paquera({ user }) {
   const [usuarios, setUsuarios] = useState([]);
   const [curtidasFeitas, setCurtidasFeitas] = useState([]);
   const [curtidasRecebidas, setCurtidasRecebidas] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [chatPrivadoAberto, setChatPrivadoAberto] = useState(null);
 
   useEffect(() => {
     // Buscar perfis em tempo real (exceto o próprio)
@@ -80,6 +82,14 @@ export default function Paquera({ user }) {
     }
   };
 
+  const abrirChatPrivado = (nomeMatch) => {
+    setChatPrivadoAberto(nomeMatch);
+  };
+
+  const fecharChatPrivado = () => {
+    setChatPrivadoAberto(null);
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case "Solteiro":
@@ -106,6 +116,17 @@ export default function Paquera({ user }) {
     }
   };
 
+  // Se há chat privado aberto, mostrar apenas o chat
+  if (chatPrivadoAberto) {
+    return (
+      <ChatPrivado 
+        user={user} 
+        match={chatPrivadoAberto} 
+        onVoltar={fecharChatPrivado}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Header mobile */}
@@ -121,19 +142,34 @@ export default function Paquera({ user }) {
       {/* Matches */}
       {matches.length > 0 && (
         <div className="glass rounded-xl p-4 border-2 border-pink-400/50 bg-gradient-to-r from-pink-900/30 to-purple-900/30">
-          <div className="text-center">
+          <div className="text-center mb-4">
             <h3 className="font-orbitron text-lg font-bold text-neon-pink mb-3">
-              🔥 CONEXÃO ESTABELECIDA!
+              🔥 CONEXÕES ESTABELECIDAS!
             </h3>
-            <div className="space-y-2">
-              {matches.map((nome, idx) => (
-                <div key={idx} className="glass-blue p-3 rounded-lg">
-                  <p className="text-sm font-semibold">
-                    💑 Match com <span className="text-neon-pink">{nome}</span>!
-                  </p>
+          </div>
+          
+          <div className="space-y-3">
+            {matches.map((nome, idx) => (
+              <div key={idx} className="glass-blue p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold mb-1">
+                      💑 Match com <span className="text-neon-pink">{nome}</span>!
+                    </p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      Vocês se curtiram mutuamente
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => abrirChatPrivado(nome)}
+                    className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-2 rounded-lg font-bold text-xs hover-glow"
+                  >
+                    💬 CHAT PRIVADO
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -208,21 +244,28 @@ export default function Paquera({ user }) {
                     </div>
                     
                     <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => handleCurtir(u.name)}
-                        disabled={jaCurtiu}
-                        className={`px-4 py-2 rounded-full font-bold text-xs transition-all duration-200 ${
-                          jaCurtiu
-                            ? "bg-gray-600/50 cursor-not-allowed text-gray-400 border border-gray-500/30"
-                            : isMatch
-                            ? "btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600"
-                            : recebeuCurtida
-                            ? "btn-futuristic bg-gradient-to-r from-purple-600 to-pink-600"
-                            : "btn-futuristic"
-                        }`}
-                      >
-                        {jaCurtiu ? "💖 ENVIADO" : recebeuCurtida ? "💜 RETRIBUIR" : "💖 CURTIR"}
-                      </button>
+                      {isMatch ? (
+                        <button
+                          onClick={() => abrirChatPrivado(u.name)}
+                          className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-2 rounded-full font-bold text-xs animate-pulse"
+                        >
+                          💬 CHAT
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleCurtir(u.name)}
+                          disabled={jaCurtiu}
+                          className={`px-4 py-2 rounded-full font-bold text-xs transition-all duration-200 ${
+                            jaCurtiu
+                              ? "bg-gray-600/50 cursor-not-allowed text-gray-400 border border-gray-500/30"
+                              : recebeuCurtida
+                              ? "btn-futuristic bg-gradient-to-r from-purple-600 to-pink-600"
+                              : "btn-futuristic"
+                          }`}
+                        >
+                          {jaCurtiu ? "💖 ENVIADO" : recebeuCurtida ? "💜 RETRIBUIR" : "💖 CURTIR"}
+                        </button>
+                      )}
                       
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -260,7 +303,7 @@ export default function Paquera({ user }) {
       {/* Footer informativo */}
       <div className="glass-dark rounded-xl p-3 text-center">
         <p className="text-xs text-gray-400 font-mono">
-          💡 SISTEMA ANÔNIMO • CURTIDAS SÓ REVELADAS EM MATCH
+          💡 SISTEMA ANÔNIMO • CHAT PRIVADO LIBERADO APÓS MATCH
         </p>
       </div>
     </div>

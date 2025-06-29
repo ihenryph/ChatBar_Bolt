@@ -76,7 +76,7 @@ function App() {
       {/* Header futurístico mobile-first */}
       <div className="glass-dark border-b border-cyan-500/30 p-3 sticky top-0 z-50">
         <div className="text-center mb-3">
-          <h1 className="font-orbitron text-xl font-bold text-neon">
+          <h1 className="font-orbitron text-2xl font-bold text-neon">
             CHATBAR
           </h1>
           <div className="text-xs text-cyan-300 mt-1">

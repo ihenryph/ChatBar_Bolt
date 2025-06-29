@@ -120,7 +120,7 @@ export default function Entry({ onEnter }) {
                 onChange={(e) => setStatus(e.target.value)}
                 disabled={loading}
               >
-                <option value="" className="bg-gray-800">STATUS RELACIONAL</option>
+                <option value="" className="bg-gray-600">STATUS RELACIONAL</option>
                 <option value="Solteiro" className="bg-gray-800">💚 DISPONÍVEL</option>
                 <option value="Comprometido" className="bg-gray-800">💛 COMPROMETIDO</option>
                 <option value="Casado" className="bg-gray-800">❤️ VINCULADO</option>

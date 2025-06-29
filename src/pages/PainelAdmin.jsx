@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy, setDoc } from "firebase/firestore";
-import { gerarDadosQRCode, QR_CONFIG } from "../utils/qrCodeUtils";
+// import { gerarDadosQRCode, QR_CONFIG } from "../utils/qrCodeUtils";
 
 export default function PainelAdmin() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,7 +10,7 @@ export default function PainelAdmin() {
   const [messages, setMessages] = useState([]);
   const [curtidas, setCurtidas] = useState([]);
   const [votos, setVotos] = useState([]);
-  const [mesaQR, setMesaQR] = useState("");
+  // const [mesaQR, setMesaQR] = useState("");
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -118,19 +118,20 @@ export default function PainelAdmin() {
     }
   };
 
-  const handleGerarQRCode = () => {
-    if (!mesaQR) {
-      alert("Digite o número da mesa");
-      return;
-    }
+  // Função QR Code - COMENTADA
+  // const handleGerarQRCode = () => {
+  //   if (!mesaQR) {
+  //     alert("Digite o número da mesa");
+  //     return;
+  //   }
 
-    const dadosQR = gerarDadosQRCode(mesaQR);
-    console.log("Dados para QR Code:", dadosQR);
+  //   const dadosQR = gerarDadosQRCode(mesaQR);
+  //   console.log("Dados para QR Code:", dadosQR);
     
-    // Por enquanto, apenas mostrar os dados
-    // Futuramente aqui será integrada uma biblioteca de QR Code
-    alert(`QR Code gerado para Mesa ${mesaQR}\n\nDados: ${dadosQR}\n\n(Funcionalidade completa será implementada em breve)`);
-  };
+  //   // Por enquanto, apenas mostrar os dados
+  //   // Futuramente aqui será integrada uma biblioteca de QR Code
+  //   alert(`QR Code gerado para Mesa ${mesaQR}\n\nDados: ${dadosQR}\n\n(Funcionalidade completa será implementada em breve)`);
+  // };
 
   // Calcular atividade das mesas
   const calcularAtividadeMesas = () => {
@@ -266,7 +267,7 @@ export default function PainelAdmin() {
         </button>
       </header>
 
-      {/* Navegação */}
+      {/* Navegação - Removido QR CODES */}
       <nav className="glass p-3 m-3 rounded-xl relative z-10">
         <div className="overflow-x-auto">
           <div className="flex gap-2 min-w-max">
@@ -275,7 +276,6 @@ export default function PainelAdmin() {
               { id: "radar", label: "📡 RADAR SOCIAL", color: "purple" },
               { id: "votacao", label: "🎵 VOTAÇÃO", color: "green" },
               { id: "sorteio", label: "🎁 SORTEIO", color: "yellow" },
-              { id: "qrcode", label: "📱 QR CODES", color: "cyan" },
               { id: "usuarios", label: "👥 USUÁRIOS", color: "orange" }
             ].map((item) => (
               <button
@@ -378,9 +378,7 @@ export default function PainelAdmin() {
                       </div>
                       <div className="text-xs text-gray-300">
                         <p><span className="text-gray-400">STATUS:</span> {u.status}</p>
-                        {u.entradaViaQR && (
-                          <p><span className="text-gray-400">ENTRADA:</span> <span className="text-cyan-300">QR CODE</span></p>
-                        )}
+                        {/* Removido indicador de entrada via QR */}
                       </div>
                     </div>
                   ))}
@@ -395,110 +393,7 @@ export default function PainelAdmin() {
           </div>
         )}
 
-        {tela === "qrcode" && (
-          <div className="space-y-4">
-            {/* Gerador de QR Code */}
-            <div className="glass-dark rounded-xl p-4 border border-cyan-500/30">
-              <h2 className="font-orbitron font-bold text-cyan-300 mb-4 text-center text-sm">
-                📱 GERADOR DE QR CODES
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="glass p-4 rounded-lg">
-                  <h3 className="font-orbitron font-bold text-white mb-3 text-sm">
-                    🏷️ GERAR QR CODE PARA MESA
-                  </h3>
-                  
-                  <div className="flex gap-2 mb-3">
-                    <input
-                      type="number"
-                      placeholder="Número da mesa"
-                      className="input-futuristic flex-1 p-3 rounded-lg text-sm"
-                      value={mesaQR}
-                      onChange={(e) => setMesaQR(e.target.value)}
-                      min="1"
-                      max="999"
-                    />
-                    <button
-                      onClick={handleGerarQRCode}
-                      className="btn-futuristic px-4 py-3 rounded-lg text-sm"
-                      disabled={!mesaQR}
-                    >
-                      📱 GERAR
-                    </button>
-                  </div>
-                  
-                  <div className="text-xs text-gray-400 space-y-1">
-                    <p>• QR Code permitirá entrada automática na mesa</p>
-                    <p>• Usuários não precisarão digitar o número da mesa</p>
-                    <p>• Sistema detectará automaticamente a mesa</p>
-                  </div>
-                </div>
-
-                {/* Preview da funcionalidade */}
-                <div className="glass p-4 rounded-lg border border-purple-500/30">
-                  <h3 className="font-orbitron font-bold text-purple-300 mb-3 text-sm">
-                    🔮 FUNCIONALIDADE FUTURA
-                  </h3>
-                  
-                  <div className="space-y-3 text-xs text-gray-300">
-                    <div className="flex items-start gap-2">
-                      <span className="text-green-400">✅</span>
-                      <span>Sistema de detecção de QR Code implementado</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-green-400">✅</span>
-                      <span>Interface de scanner preparada</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-yellow-400">⏳</span>
-                      <span>Integração com biblioteca de QR Code</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-yellow-400">⏳</span>
-                      <span>Acesso à câmera do dispositivo</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-yellow-400">⏳</span>
-                      <span>Geração visual de QR Codes</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Estatísticas de entrada via QR */}
-                <div className="glass p-4 rounded-lg border border-green-500/30">
-                  <h3 className="font-orbitron font-bold text-green-300 mb-3 text-sm">
-                    📊 ESTATÍSTICAS DE ENTRADA
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="glass-blue p-3 rounded-lg text-center">
-                      <div className="text-lg font-bold text-blue-300">
-                        {usuarios.filter(u => u.entradaViaQR).length}
-                      </div>
-                      <div className="text-xs text-blue-200 font-mono">VIA QR CODE</div>
-                    </div>
-                    <div className="glass p-3 rounded-lg text-center bg-gray-900/20 border border-gray-500/30">
-                      <div className="text-lg font-bold text-gray-300">
-                        {usuarios.filter(u => !u.entradaViaQR).length}
-                      </div>
-                      <div className="text-xs text-gray-200 font-mono">MANUAL</div>
-                    </div>
-                  </div>
-                  
-                  {usuarios.length > 0 && (
-                    <div className="mt-3 text-center">
-                      <div className="text-xs text-gray-400 font-mono">
-                        {Math.round((usuarios.filter(u => u.entradaViaQR).length / usuarios.length) * 100)}% 
-                        dos usuários entraram via QR Code
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Seção QR Code removida completamente */}
 
         {/* Outras telas mantidas iguais... */}
         {tela === "radar" && (
@@ -809,9 +704,7 @@ export default function PainelAdmin() {
                         <p><span className="text-gray-400">INTERESSES:</span> {u.interesses}</p>
                       )}
                       <p><span className="text-gray-400">CONEXÃO:</span> {u.timestamp?.toDate?.().toLocaleString() || 'N/A'}</p>
-                      {u.entradaViaQR && (
-                        <p><span className="text-gray-400">ENTRADA:</span> <span className="text-cyan-300">QR CODE</span></p>
-                      )}
+                      {/* Removido indicador de entrada via QR */}
                     </div>
                   </div>
                 ))}

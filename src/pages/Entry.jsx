@@ -78,7 +78,7 @@ export default function Entry({ onEnter }) {
           </h1>
           <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>
           <p className="text-gray-300 mt-3 text-sm">
-            Sistema de Comunicação Neural
+            Entreterimento Casual
           </p>
         </div>
 
@@ -191,7 +191,7 @@ export default function Entry({ onEnter }) {
       {/* Rodapé futurístico */}
       <div className="mt-6 text-center">
         <p className="text-xs text-gray-500 font-mono">
-          CHATBAR v2.0 • PROJETO RAFAEL HENRIQUE
+          CHATBAR v2.0 • PROJETO RAFAEL HENRIQUE N ALVES
         </p>
       </div>
     </div>

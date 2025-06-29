@@ -70,7 +70,7 @@ export default function Entry({ onEnter }) {
       </div>
 
       {/* Container principal mobile-first */}
-      <div className="glass-dark rounded-2xl p-6 w-full max-w-sm relative z-20 border-animated">
+      <div className="glass-dark rounded-2xl p-6 w-full max-w-sm relative z-5 border-animated">
         {/* Logo/Título */}
         <div className="text-center mb-6">
           <h1 className="font-orbitron text-2x1 font-bold text-neon mb-2 float">

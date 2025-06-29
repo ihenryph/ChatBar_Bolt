@@ -72,83 +72,83 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen text-white relative">
-      {/* Header futurístico */}
-      <div className="glass-dark border-b border-cyan-500/30 p-4 relative z-10">
-        <div className="flex justify-center items-center mb-4">
-          <h1 className="font-orbitron text-2xl font-bold text-neon mr-4">
+    <div className="min-h-screen text-white bg-gray-900">
+      {/* Header mobile-first */}
+      <div className="glass-dark border-b border-cyan-500/30 p-3 sticky top-0 z-50">
+        <div className="text-center mb-3">
+          <h1 className="font-orbitron text-xl font-bold text-neon">
             CHATBAR
           </h1>
-          <div className="text-sm text-cyan-300">
+          <div className="text-xs text-cyan-300 mt-1">
             <span className="text-neon-pink">{user.name}</span> • Mesa {user.table}
           </div>
         </div>
 
-        {/* Navegação futurística */}
-        <div className="flex justify-center items-center">
-          <div className="glass p-2 rounded-full flex gap-1 flex-wrap justify-center">
+        {/* Navegação mobile otimizada */}
+        <div className="overflow-x-auto">
+          <div className="flex gap-2 min-w-max px-2">
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "chat" 
                   ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
-                  : "text-gray-300 hover:text-cyan-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("chat")}
             >
               💬 Chat
             </button>
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "radar" 
                   ? "bg-yellow-500/30 text-yellow-300 border border-yellow-400/50" 
-                  : "text-gray-300 hover:text-yellow-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("radar")}
             >
               📡 Radar
             </button>
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "votacao" 
                   ? "bg-green-500/30 text-green-300 border border-green-400/50" 
-                  : "text-gray-300 hover:text-green-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("votacao")}
             >
               🎵 Votação
             </button>
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "perfil" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
-                  : "text-gray-300 hover:text-purple-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("perfil")}
             >
               👤 Perfil
             </button>
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "sorteio" 
                   ? "bg-pink-500/30 text-pink-300 border border-pink-400/50" 
-                  : "text-gray-300 hover:text-pink-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("sorteio")}
             >
               🎁 Sorteio
             </button>
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 telaAtual === "paquera" 
                   ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
-                  : "text-gray-300 hover:text-rose-300"
+                  : "text-gray-300 bg-gray-800/50"
               }`}
               onClick={() => setTelaAtual("paquera")}
             >
               💘 Paquera
             </button>
             <button
-              className="px-4 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30"
+              className="px-3 py-2 rounded-full text-xs font-medium text-red-300 bg-red-900/30 border border-red-500/30 whitespace-nowrap"
               onClick={handleLogout}
             >
               🚪 Sair
@@ -157,8 +157,8 @@ function App() {
         </div>
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="p-4 relative z-10">
+      {/* Conteúdo principal com padding mobile */}
+      <div className="p-3 pb-20">
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}

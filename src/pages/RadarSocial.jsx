@@ -62,84 +62,84 @@ export default function RadarSocial({ user }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header do Radar */}
-      <div className="glass-dark rounded-2xl p-6 text-center">
-        <h2 className="font-orbitron text-3xl font-bold text-neon mb-3">
+    <div className="space-y-4">
+      {/* Header do Radar mobile */}
+      <div className="glass-dark rounded-xl p-4 text-center">
+        <h2 className="font-orbitron text-xl font-bold text-neon mb-2">
           RADAR SOCIAL
         </h2>
-        <div className="flex items-center justify-center gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+        <div className="flex items-center justify-center gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-green-300 font-mono">
-              {usuarios.length} ENTIDADES DETECTADAS
+              {usuarios.length} DETECTADOS
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-cyan-400 rounded-full pulse-glow"></div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full pulse-glow"></div>
             <span className="text-cyan-300 font-mono">VARREDURA ATIVA</span>
           </div>
         </div>
       </div>
 
       {usuarios.length === 0 ? (
-        <div className="glass-dark rounded-2xl p-12 text-center">
-          <div className="text-8xl mb-6 opacity-30">📡</div>
-          <h3 className="font-orbitron text-xl text-gray-400 mb-2">
+        <div className="glass-dark rounded-xl p-8 text-center">
+          <div className="text-6xl mb-4 opacity-30">📡</div>
+          <h3 className="font-orbitron text-lg text-gray-400 mb-2">
             RADAR EM STANDBY
           </h3>
-          <p className="text-gray-500 font-mono">
-            Aguardando sinais de outras entidades...
+          <p className="text-gray-500 text-sm font-mono">
+            Aguardando sinais...
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-3">
           {usuarios.map((u, idx) => {
             const isCurrentUser = u.name === user.name && u.table === user.table;
             
             return (
               <div
                 key={`${u.name}-${u.table}`}
-                className={`glass-dark rounded-2xl p-6 border-2 transition-all duration-500 hover-glow relative overflow-hidden ${
+                className={`glass-dark rounded-xl p-4 border-2 transition-all duration-300 relative overflow-hidden ${
                   isCurrentUser 
-                    ? "border-cyan-400/50 bg-cyan-900/20 hologram" 
+                    ? "border-cyan-400/50 bg-cyan-900/20" 
                     : getStatusColor(u.status)
                 }`}
               >
                 {/* Efeito de scan */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
                 
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-orbitron text-lg font-bold text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-orbitron font-bold text-white text-sm truncate">
                         {isCurrentUser ? `${u.name} [VOCÊ]` : u.name}
                       </span>
-                      <div className="glass px-3 py-1 rounded-full text-xs font-mono">
-                        SETOR {u.table}
+                      <div className="glass px-2 py-1 rounded-full text-xs font-mono flex-shrink-0">
+                        Mesa {u.table}
                       </div>
                       {isCurrentUser && (
-                        <div className="bg-cyan-500/30 px-2 py-1 rounded-full text-xs font-bold text-cyan-300 border border-cyan-400/50 animate-pulse">
+                        <div className="bg-cyan-500/30 px-2 py-1 rounded-full text-xs font-bold text-cyan-300 border border-cyan-400/50 flex-shrink-0">
                           SELF
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-3 text-sm mb-3">
-                      <span className="text-2xl">{getStatusIcon(u.status)}</span>
+                    <div className="flex items-center gap-2 text-xs mb-2">
+                      <span className="text-lg">{getStatusIcon(u.status)}</span>
                       <span className="text-gray-300 font-mono">{u.status}</span>
                     </div>
                     
                     {u.interesses && (
-                      <div className="text-sm">
+                      <div className="text-xs">
                         <span className="text-gray-400 font-mono">INTERESSES: </span>
                         <span className="text-gray-300">{u.interesses}</span>
                       </div>
                     )}
                   </div>
                   
-                  <div className="text-right">
-                    <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse mb-2 pulse-glow"></div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mb-1 pulse-glow"></div>
                     <span className="text-xs text-green-300 font-mono block">ONLINE</span>
                     <span className="text-xs text-gray-500 font-mono">
                       ID: {String(idx + 1).padStart(3, '0')}
@@ -147,14 +147,14 @@ export default function RadarSocial({ user }) {
                   </div>
                 </div>
 
-                {/* Barra de sinal */}
-                <div className="flex items-center gap-2 mt-4">
+                {/* Barra de sinal mobile */}
+                <div className="flex items-center gap-2 mt-3">
                   <span className="text-xs text-gray-400 font-mono">SINAL:</span>
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <div
                         key={i}
-                        className={`w-1 h-3 rounded-full ${
+                        className={`w-1 h-2 rounded-full ${
                           i < 4 ? 'bg-green-400' : 'bg-gray-600'
                         }`}
                         style={{
@@ -172,9 +172,9 @@ export default function RadarSocial({ user }) {
       )}
 
       {/* Footer informativo */}
-      <div className="glass-dark rounded-2xl p-4 text-center">
+      <div className="glass-dark rounded-xl p-3 text-center">
         <p className="text-xs text-gray-400 font-mono">
-          💡 RADAR ATUALIZA AUTOMATICAMENTE • DETECÇÃO EM TEMPO REAL
+          💡 RADAR ATUALIZA AUTOMATICAMENTE • TEMPO REAL
         </p>
       </div>
     </div>

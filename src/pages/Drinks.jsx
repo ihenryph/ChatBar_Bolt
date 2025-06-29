@@ -6,7 +6,6 @@ import {
   onSnapshot,
   query,
   where,
-  orderBy,
   serverTimestamp,
   getDocs,
   doc,
@@ -46,34 +45,44 @@ export default function Drinks({ user }) {
       setUsuarios(outros);
     });
 
-    // Observar drinks enviados por mim
+    // Observar drinks enviados por mim (removido orderBy para evitar erro de índice)
     const unsubEnviados = onSnapshot(
       query(
         collection(db, "drinks"),
-        where("de", "==", user.name),
-        orderBy("timestamp", "desc")
+        where("de", "==", user.name)
       ),
       (snapshot) => {
-        const enviados = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const enviados = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          // Ordenar no cliente por timestamp (mais recente primeiro)
+          .sort((a, b) => {
+            if (!a.timestamp || !b.timestamp) return 0;
+            return b.timestamp.toMillis() - a.timestamp.toMillis();
+          });
         setDrinksEnviados(enviados);
       }
     );
 
-    // Observar drinks recebidos por mim
+    // Observar drinks recebidos por mim (removido orderBy para evitar erro de índice)
     const unsubRecebidos = onSnapshot(
       query(
         collection(db, "drinks"),
-        where("para", "==", user.name),
-        orderBy("timestamp", "desc")
+        where("para", "==", user.name)
       ),
       (snapshot) => {
-        const recebidos = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const recebidos = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          // Ordenar no cliente por timestamp (mais recente primeiro)
+          .sort((a, b) => {
+            if (!a.timestamp || !b.timestamp) return 0;
+            return b.timestamp.toMillis() - a.timestamp.toMillis();
+          });
         setDrinksRecebidos(recebidos);
       }
     );

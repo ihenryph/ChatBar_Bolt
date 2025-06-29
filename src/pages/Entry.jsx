@@ -191,7 +191,7 @@ export default function Entry({ onEnter }) {
       {/* Rodapé futurístico */}
       <div className="mt-6 text-center">
         <p className="text-xs text-gray-500 font-mono">
-          CHATBAR v2.0 • NEURAL NETWORK PROTOCOL
+          CHATBAR v2.0 • PROJETO RAFAEL HENRIQUE
         </p>
       </div>
     </div>

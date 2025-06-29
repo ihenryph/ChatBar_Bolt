@@ -4,7 +4,6 @@ import { Send, ArrowLeft, Heart } from "lucide-react";
 import {
   collection,
   query,
-  orderBy,
   onSnapshot,
   addDoc,
   serverTimestamp,
@@ -111,6 +110,15 @@ export default function ChatPrivado({ user, match, onVoltar }) {
     }
   };
 
+  // Função para lidar com teclas pressionadas
+  const handleKeyDown = (e) => {
+    // ENTER sem SHIFT = quebra linha (comportamento padrão do textarea)
+    // Não fazer nada especial, deixar o textarea quebrar linha naturalmente
+    
+    // Remover qualquer comportamento de envio com ENTER
+    // A mensagem só será enviada clicando no botão
+  };
+
   return (
     <div className="space-y-3 h-full flex flex-col">
       {/* Header do Chat Privado */}
@@ -206,7 +214,7 @@ export default function ChatPrivado({ user, match, onVoltar }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input de mensagem privada */}
+      {/* Input de mensagem privada otimizado para mobile */}
       <form onSubmit={handleSend} className="glass rounded-xl p-3 border border-pink-500/30">
         <div className="flex gap-2 items-end">
           <div className="flex-1">
@@ -214,25 +222,25 @@ export default function ChatPrivado({ user, match, onVoltar }) {
               value={newMessage}
               onChange={(e) => {
                 setNewMessage(e.target.value);
+                // Auto-resize do textarea
                 e.target.style.height = 'auto';
-                e.target.style.height = `${e.target.scrollHeight}px`;
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
+              onKeyDown={handleKeyDown}
               placeholder="Digite sua mensagem privada..."
-              className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed max-h-24 focus:outline-none text-sm border border-pink-400/30"
+              className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed min-h-[44px] max-h-[120px] focus:outline-none text-sm border border-pink-400/30"
               rows={1}
               disabled={loading}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend(e);
-                }
+              style={{ 
+                fontSize: '16px', // Evita zoom no iOS
+                lineHeight: '1.5'
               }}
             />
           </div>
           
           <button 
             type="submit"
-            className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 p-3 rounded-lg disabled:opacity-50 flex-shrink-0"
+            className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 p-3 rounded-lg disabled:opacity-50 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
             disabled={!newMessage.trim() || loading}
           >
             {loading ? (
@@ -244,7 +252,7 @@ export default function ChatPrivado({ user, match, onVoltar }) {
         </div>
         
         <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
-          <span className="font-mono">SHIFT + ENTER para quebra</span>
+          <span className="font-mono">ENTER para quebra de linha</span>
           <div className="flex items-center gap-1">
             <div className="w-1 h-1 bg-pink-400 rounded-full animate-pulse"></div>
             <span>CHAT PRIVADO ATIVO</span>

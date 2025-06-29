@@ -64,6 +64,15 @@ export default function ChatRoom({ user, onLogout }) {
     }
   };
 
+  // Função para lidar com teclas pressionadas
+  const handleKeyDown = (e) => {
+    // ENTER sem SHIFT = quebra linha (comportamento padrão do textarea)
+    // Não fazer nada especial, deixar o textarea quebrar linha naturalmente
+    
+    // Remover qualquer comportamento de envio com ENTER
+    // A mensagem só será enviada clicando no botão
+  };
+
   return (
     <div className="space-y-3">
       {/* Header do Chat mobile */}
@@ -143,7 +152,7 @@ export default function ChatRoom({ user, onLogout }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input de mensagem mobile */}
+      {/* Input de mensagem mobile otimizado */}
       <form onSubmit={handleSend} className="glass-dark rounded-xl p-3">
         <div className="flex gap-2 items-end">
           <div className="flex-1">
@@ -151,24 +160,24 @@ export default function ChatRoom({ user, onLogout }) {
               value={newMessage}
               onChange={(e) => {
                 setNewMessage(e.target.value);
+                // Auto-resize do textarea
                 e.target.style.height = 'auto';
-                e.target.style.height = `${e.target.scrollHeight}px`;
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
+              onKeyDown={handleKeyDown}
               placeholder="Digite sua mensagem..."
-              className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed max-h-24 focus:outline-none text-sm"
+              className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed min-h-[44px] max-h-[120px] focus:outline-none text-sm"
               rows={1}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend(e);
-                }
+              style={{ 
+                fontSize: '16px', // Evita zoom no iOS
+                lineHeight: '1.5'
               }}
             />
           </div>
           
           <button 
             type="submit"
-            className="btn-futuristic p-3 rounded-lg disabled:opacity-50 flex-shrink-0"
+            className="btn-futuristic p-3 rounded-lg disabled:opacity-50 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
             disabled={!newMessage.trim()}
           >
             <Send size={16} />
@@ -176,7 +185,7 @@ export default function ChatRoom({ user, onLogout }) {
         </div>
         
         <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
-          <span className="font-mono">SHIFT + ENTER para quebra</span>
+          <span className="font-mono">ENTER para quebra de linha</span>
           <div className="flex items-center gap-1">
             <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
             <span>ATIVO</span>

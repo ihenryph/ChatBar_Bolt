@@ -9,6 +9,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import confetti from "canvas-confetti";
 
 export default function Sorteio({ user }) {
   const [participantes, setParticipantes] = useState([]);
@@ -16,18 +17,28 @@ export default function Sorteio({ user }) {
   const [jaParticipando, setJaParticipando] = useState(false);
   const [loading, setLoading] = useState(false);
   const [historico, setHistorico] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     // Observar dados do sorteio em tempo real
     const unsubscribe = onSnapshot(doc(db, "sorteio", "dados"), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setParticipantes(data.participantes || []);
-        setGanhador(data.ganhador || null);
+        const novosParticipantes = data.participantes || [];
+        const novoGanhador = data.ganhador || null;
+        
+        // Detectar se há um novo ganhador
+        if (novoGanhador && !ganhador) {
+          console.log("🏆 Novo ganhador detectado:", novoGanhador);
+          celebrarGanhador();
+        }
+        
+        setParticipantes(novosParticipantes);
+        setGanhador(novoGanhador);
         setHistorico(data.historico || []);
         
         // Verificar se o usuário já está participando
-        const jaEstaParticipando = (data.participantes || []).some(
+        const jaEstaParticipando = novosParticipantes.some(
           p => p.name === user.name && p.table === user.table
         );
         setJaParticipando(jaEstaParticipando);
@@ -42,7 +53,62 @@ export default function Sorteio({ user }) {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, ganhador]);
+
+  const celebrarGanhador = () => {
+    // Tocar som de vitória
+    const audio = new Audio("/sounds/curtida.mp3");
+    audio.play().catch(() => {
+      console.log("Não foi possível tocar o som");
+    });
+
+    // Mostrar animação de celebração
+    setShowCelebration(true);
+
+    // Disparar confete múltiplas vezes
+    const duration = 5000; // 5 segundos
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      // Confete dourado do lado esquerdo
+      confetti({
+        particleCount: 30,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.8 },
+        colors: ['#FFD700', '#FFA500', '#FF6347', '#FF1493', '#9370DB']
+      });
+
+      // Confete dourado do lado direito
+      confetti({
+        particleCount: 30,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.8 },
+        colors: ['#FFD700', '#FFA500', '#FF6347', '#FF1493', '#9370DB']
+      });
+
+      // Confete do centro
+      confetti({
+        particleCount: 50,
+        angle: 90,
+        spread: 100,
+        origin: { x: 0.5, y: 0.3 },
+        colors: ['#FFD700', '#FFA500', '#FF6347', '#FF1493', '#9370DB']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+
+    // Remover animação após 5 segundos
+    setTimeout(() => {
+      setShowCelebration(false);
+    }, 5000);
+  };
 
   const handleParticipar = async () => {
     if (jaParticipando || loading) return;
@@ -75,7 +141,25 @@ export default function Sorteio({ user }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
+      {/* Overlay de celebração */}
+      {showCelebration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="text-center animate-bounce">
+            <div className="text-8xl mb-4 animate-spin">🏆</div>
+            <div className="glass-dark rounded-2xl p-6 border-4 border-yellow-400/80 bg-gradient-to-r from-yellow-900/90 to-orange-900/90">
+              <h2 className="font-orbitron text-3xl font-bold text-yellow-300 mb-2 animate-pulse">
+                PARABÉNS!
+              </h2>
+              <div className="text-6xl mb-4">🎉🎊🎉</div>
+              <p className="text-white text-lg font-mono animate-pulse">
+                GANHADOR SORTEADO!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header mobile */}
       <div className="glass-dark rounded-xl p-4 text-center">
         <h2 className="font-orbitron text-xl font-bold text-neon mb-2">
@@ -97,18 +181,26 @@ export default function Sorteio({ user }) {
 
       {/* Status do Ganhador */}
       {ganhador && (
-        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30">
+        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 animate-pulse">
           <div className="text-center">
+            <div className="text-6xl mb-4 animate-bounce">🏆</div>
             <h3 className="font-orbitron text-xl font-bold text-yellow-300 mb-3">
-              🏆 GANHADOR!
+              GANHADOR SORTEADO!
             </h3>
-            <div className="glass-blue p-4 rounded-lg">
-              <p className="text-lg font-bold text-white mb-1">
+            <div className="glass-blue p-4 rounded-lg border-2 border-yellow-400/50">
+              <p className="text-lg font-bold text-white mb-1 animate-pulse">
                 {ganhador.name}
               </p>
               <p className="text-sm text-yellow-300 font-mono">
                 MESA {ganhador.table}
               </p>
+            </div>
+            <div className="flex justify-center gap-2 mt-4 text-2xl">
+              <span className="animate-bounce" style={{animationDelay: '0s'}}>🎉</span>
+              <span className="animate-bounce" style={{animationDelay: '0.1s'}}>🎊</span>
+              <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🎉</span>
+              <span className="animate-bounce" style={{animationDelay: '0.3s'}}>🎊</span>
+              <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🎉</span>
             </div>
             <p className="text-gray-300 mt-3 text-sm font-mono">
               Parabéns! Sorteado entre {participantes.length} participantes!
@@ -201,24 +293,34 @@ export default function Sorteio({ user }) {
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {participantes.map((p, i) => {
               const isCurrentUser = p.name === user.name && p.table === user.table;
+              const isWinner = ganhador && ganhador.name === p.name && ganhador.table === p.table;
               
               return (
                 <div
                   key={i}
                   className={`glass p-3 rounded-lg border transition-all duration-200 ${
-                    isCurrentUser 
+                    isWinner 
+                      ? "border-yellow-400/80 bg-yellow-900/30 animate-pulse" 
+                      : isCurrentUser 
                       ? "border-cyan-400/50 bg-cyan-900/20" 
                       : "border-gray-600/30"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {isWinner && <span className="text-lg animate-bounce">🏆</span>}
                       <span className="font-orbitron font-semibold text-white text-sm truncate">
                         {isCurrentUser ? `${p.name} [VOCÊ]` : p.name}
+                        {isWinner && " 🎉"}
                       </span>
-                      {isCurrentUser && (
+                      {isCurrentUser && !isWinner && (
                         <div className="bg-cyan-500/30 px-2 py-1 rounded-full text-xs font-bold text-cyan-300 border border-cyan-400/50 flex-shrink-0">
                           SELF
+                        </div>
+                      )}
+                      {isWinner && (
+                        <div className="bg-yellow-500/30 px-2 py-1 rounded-full text-xs font-bold text-yellow-300 border border-yellow-400/50 flex-shrink-0 animate-pulse">
+                          GANHADOR!
                         </div>
                       )}
                     </div>

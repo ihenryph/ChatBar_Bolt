@@ -73,7 +73,7 @@ export default function Entry({ onEnter }) {
       <div className="glass-dark rounded-2xl p-6 w-full max-w-sm relative z-5 border-animated">
         {/* Logo/Título */}
         <div className="text-center mb-6">
-          <h1 className="font-orbitron text-4xl font-bold text-neon mb-4">
+          <h1 className="font-orbitron text-4xl font-bold text mb-4">
             CHATBAR
           </h1>
           <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>

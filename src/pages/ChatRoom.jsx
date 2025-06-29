@@ -185,7 +185,7 @@ export default function ChatRoom({ user, onLogout }) {
         </div>
         
         <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
-          <span className="font-mono">ENTER para quebra de linha</span>
+          {/*<span className="font-mono">ENTER para quebra de linha</span>*/}
           <div className="flex items-center gap-1">
             <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
             <span>ATIVO</span>

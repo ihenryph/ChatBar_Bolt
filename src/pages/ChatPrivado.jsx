@@ -38,18 +38,24 @@ export default function ChatPrivado({ user, match, onVoltar }) {
 
     criarChatPrivado();
 
-    // Observar mensagens do chat privado
+    // Query simplificada para evitar índice composto
+    // Removendo orderBy para evitar erro de índice
     const q = query(
       collection(db, "mensagens_privadas"),
-      where("chatId", "==", chatId),
-      orderBy("timestamp")
+      where("chatId", "==", chatId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      }))
+      // Ordenar no cliente em vez de no servidor
+      .sort((a, b) => {
+        const aTime = a.timestamp?.toDate?.() || new Date(0);
+        const bTime = b.timestamp?.toDate?.() || new Date(0);
+        return aTime - bTime;
+      });
 
       // Tocar som para mensagens novas (que não são minhas)
       const lastMsg = msgs[msgs.length - 1];
@@ -59,6 +65,10 @@ export default function ChatPrivado({ user, match, onVoltar }) {
       }
 
       setMessages(msgs);
+    }, (error) => {
+      console.error("Erro ao observar mensagens:", error);
+      // Se der erro, inicializar com array vazio
+      setMessages([]);
     });
 
     return () => unsubscribe();

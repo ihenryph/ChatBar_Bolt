@@ -88,7 +88,7 @@ export default function Entry({ onEnter }) {
             <div className="relative">
               <input
                 type="text"
-                placeholder="IDENTIFICAÇÃO"
+                placeholder="Nome"
                 className="input-futuristic w-full p-3 rounded-xl font-medium"
                 value={name}
                 onChange={(e) => setName(e.target.value)}

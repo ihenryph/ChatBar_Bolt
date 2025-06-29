@@ -6,6 +6,7 @@ import RadarSocial from "./pages/RadarSocial";
 import Sorteio from "./pages/Sorteio";
 import Profile from "./pages/Profile";
 import Paquera from "./pages/Paquera";
+import Drinks from "./pages/Drinks";
 import Notificacoes from "./pages/Notificacoes";
 import PainelAdmin from "./pages/PainelAdmin";
 import { limparDadosUsuario, verificarDadosRestantes } from "./utils/limparDadosUsuario";
@@ -119,13 +120,23 @@ function App() {
             </button>
             <button
               className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
-                telaAtual === "perfil" 
+                telaAtual === "drinks" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
                   : "text-gray-300 hover:text-purple-300"
               }`}
-              onClick={() => setTelaAtual("perfil")}
+              onClick={() => setTelaAtual("drinks")}
             >
-              👤 Perfil
+              🍻 Drinks
+            </button>
+            <button
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+                telaAtual === "paquera" 
+                  ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
+                  : "text-gray-300 hover:text-rose-300"
+              }`}
+              onClick={() => setTelaAtual("paquera")}
+            >
+              💘 Paquera
             </button>
             <button
               className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
@@ -139,13 +150,13 @@ function App() {
             </button>
             <button
               className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
-                telaAtual === "paquera" 
-                  ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
-                  : "text-gray-300 hover:text-rose-300"
+                telaAtual === "perfil" 
+                  ? "bg-blue-500/30 text-blue-300 border border-blue-400/50" 
+                  : "text-gray-300 hover:text-blue-300"
               }`}
-              onClick={() => setTelaAtual("paquera")}
+              onClick={() => setTelaAtual("perfil")}
             >
-              💘 Paquera
+              👤 Perfil
             </button>
             <button
               className="px-3 py-2 rounded-full text-xs font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30 whitespace-nowrap"
@@ -162,6 +173,7 @@ function App() {
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}
+        {telaAtual === "drinks" && <Drinks user={user} />}
         {telaAtual === "sorteio" && <Sorteio user={user} />}
         {telaAtual === "perfil" && (<Profile user={user} onBack={() => setTelaAtual("chat")}/>)}
         {telaAtual === "paquera" && <Paquera user={user} />}

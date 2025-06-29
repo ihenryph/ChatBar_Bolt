@@ -13,8 +13,10 @@ export default function Notificacoes({ user }) {
   const [match, setMatch] = useState(null);
   const [curtida, setCurtida] = useState(false);
   const [mensagemPrivada, setMensagemPrivada] = useState(null);
+  const [drinkRecebido, setDrinkRecebido] = useState(null);
   const curtidasRecebidasRef = useRef(new Set());
   const mensagensRecebidasRef = useRef(new Set());
+  const drinksRecebidosRef = useRef(new Set());
 
   useEffect(() => {
     if (!user?.name) return;
@@ -69,9 +71,39 @@ export default function Notificacoes({ user }) {
       });
     });
 
+    // Observar drinks recebidos
+    const qDrinks = query(
+      collection(db, "drinks"), 
+      where("para", "==", user.name),
+      where("status", "==", "pendente")
+    );
+    const unsubDrinks = onSnapshot(qDrinks, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const drinkData = change.doc.data();
+          const drinkId = change.doc.id;
+          
+          if (!drinksRecebidosRef.current.has(drinkId)) {
+            drinksRecebidosRef.current.add(drinkId);
+            tocarSom();
+            dispararConfeteDrink();
+            setDrinkRecebido({
+              de: drinkData.anonimo ? "🎭 Admirador Secreto" : drinkData.de,
+              drinkNome: drinkData.drinkNome,
+              drinkEmoji: drinkData.drinkEmoji,
+              preco: drinkData.preco,
+              anonimo: drinkData.anonimo
+            });
+            setTimeout(() => setDrinkRecebido(null), 7000); // some após 7s
+          }
+        }
+      });
+    });
+
     return () => {
       unsubCurtidas();
       unsubMensagens();
+      unsubDrinks();
     };
   }, [user]);
 
@@ -86,6 +118,15 @@ export default function Notificacoes({ user }) {
       spread: 70,
       origin: { y: 0.6 },
       colors: ['#ff69b4', '#ff1493', '#da70d6', '#ba55d3']
+    });
+  };
+
+  const dispararConfeteDrink = () => {
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#ffd700', '#ffa500', '#ff6347', '#32cd32', '#1e90ff']
     });
   };
 
@@ -135,6 +176,33 @@ export default function Notificacoes({ user }) {
                 Nova mensagem privada
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notificação de drink recebido */}
+      {drinkRecebido && (
+        <div className="fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <div className="glass rounded-2xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/80 to-orange-900/80 text-center animate-bounce">
+            <div className="text-6xl mb-4">{drinkRecebido.drinkEmoji}</div>
+            <h3 className="font-orbitron text-xl font-bold text-yellow-300 mb-2">
+              DRINK RECEBIDO!
+            </h3>
+            <p className="text-white font-mono mb-1">
+              <span className="text-yellow-300 font-bold">{drinkRecebido.drinkNome}</span>
+            </p>
+            <p className="text-sm text-gray-300 font-mono mb-2">
+              De: {drinkRecebido.de}
+            </p>
+            <p className="text-lg font-bold text-green-300">
+              R$ {drinkRecebido.preco}
+            </p>
+            <p className="text-xs text-gray-300 mt-2 font-mono">
+              {drinkRecebido.anonimo ? "🎭 Admirador secreto!" : "📢 Drink público!"}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Vá para a aba Drinks para aceitar/recusar
+            </p>
           </div>
         </div>
       )}

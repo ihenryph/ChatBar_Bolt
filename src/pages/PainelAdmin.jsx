@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy, setDoc } from "firebase/firestore";
-// import { gerarDadosQRCode, QR_CONFIG } from "../utils/qrCodeUtils";
 
 export default function PainelAdmin() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,7 +9,7 @@ export default function PainelAdmin() {
   const [messages, setMessages] = useState([]);
   const [curtidas, setCurtidas] = useState([]);
   const [votos, setVotos] = useState([]);
-  // const [mesaQR, setMesaQR] = useState("");
+  const [drinks, setDrinks] = useState([]);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -70,6 +69,18 @@ export default function PainelAdmin() {
       }
     );
 
+    // Observar drinks em tempo real
+    const unsubDrinks = onSnapshot(
+      query(collection(db, "drinks"), orderBy("timestamp", "desc")),
+      (snapshot) => {
+        const drinksList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDrinks(drinksList);
+      }
+    );
+
     fetchUsuarios();
     fetchSorteio();
 
@@ -77,6 +88,7 @@ export default function PainelAdmin() {
       unsubMessages();
       unsubCurtidas();
       unsubVotos();
+      unsubDrinks();
     };
   }, []);
 
@@ -118,21 +130,6 @@ export default function PainelAdmin() {
     }
   };
 
-  // Função QR Code - COMENTADA
-  // const handleGerarQRCode = () => {
-  //   if (!mesaQR) {
-  //     alert("Digite o número da mesa");
-  //     return;
-  //   }
-
-  //   const dadosQR = gerarDadosQRCode(mesaQR);
-  //   console.log("Dados para QR Code:", dadosQR);
-    
-  //   // Por enquanto, apenas mostrar os dados
-  //   // Futuramente aqui será integrada uma biblioteca de QR Code
-  //   alert(`QR Code gerado para Mesa ${mesaQR}\n\nDados: ${dadosQR}\n\n(Funcionalidade completa será implementada em breve)`);
-  // };
-
   // Calcular atividade das mesas
   const calcularAtividadeMesas = () => {
     const atividadePorMesa = {};
@@ -164,6 +161,16 @@ export default function PainelAdmin() {
       }
     });
 
+    // Contar drinks por mesa
+    drinks.forEach(drink => {
+      if (drink.mesaDe) {
+        atividadePorMesa[drink.mesaDe] = (atividadePorMesa[drink.mesaDe] || 0) + 0.8;
+      }
+      if (drink.mesaPara) {
+        atividadePorMesa[drink.mesaPara] = (atividadePorMesa[drink.mesaPara] || 0) + 0.8;
+      }
+    });
+
     return Object.entries(atividadePorMesa)
       .map(([mesa, atividade]) => ({ mesa, atividade: Math.round(atividade * 10) / 10 }))
       .sort((a, b) => b.atividade - a.atividade);
@@ -189,6 +196,13 @@ export default function PainelAdmin() {
     votos.forEach(voto => {
       if (voto.userName) {
         atividadePorUsuario[voto.userName] = (atividadePorUsuario[voto.userName] || 0) + 0.5;
+      }
+    });
+
+    // Contar drinks enviados
+    drinks.forEach(drink => {
+      if (drink.de) {
+        atividadePorUsuario[drink.de] = (atividadePorUsuario[drink.de] || 0) + 1.5;
       }
     });
 
@@ -219,15 +233,37 @@ export default function PainelAdmin() {
       .slice(0, 5); // Top 5
   };
 
+  // Calcular estatísticas de drinks
+  const calcularEstatisticasDrinks = () => {
+    const totalDrinks = drinks.length;
+    const drinksAceitos = drinks.filter(d => d.status === "aceito").length;
+    const drinksRecusados = drinks.filter(d => d.status === "recusado").length;
+    const drinksPendentes = drinks.filter(d => d.status === "pendente").length;
+    const drinksAnonimos = drinks.filter(d => d.anonimo).length;
+    
+    const valorTotal = drinks.reduce((total, drink) => total + (drink.preco || 0), 0);
+    
+    return {
+      total: totalDrinks,
+      aceitos: drinksAceitos,
+      recusados: drinksRecusados,
+      pendentes: drinksPendentes,
+      anonimos: drinksAnonimos,
+      valorTotal: valorTotal
+    };
+  };
+
   const mesasAtivas = calcularAtividadeMesas();
   const perfisAtivos = calcularPerfisAtivos();
   const musicasPopulares = calcularEstatisticasVotacao();
+  const estatisticasDrinks = calcularEstatisticasDrinks();
   const maxAtividade = Math.max(...mesasAtivas.map(m => m.atividade), 1);
 
   // Calcular estatísticas gerais
   const totalMensagens = messages.length;
   const totalCurtidas = curtidas.length;
   const totalVotos = votos.length;
+  const totalDrinks = drinks.length;
   const usuariosSolteiros = usuarios.filter(u => u.status === "Solteiro").length;
   const usuariosComprometidos = usuarios.filter(u => u.status === "Comprometido" || u.status === "Casado").length;
 
@@ -267,7 +303,7 @@ export default function PainelAdmin() {
         </button>
       </header>
 
-      {/* Navegação - Removido QR CODES */}
+      {/* Navegação */}
       <nav className="glass p-3 m-3 rounded-xl relative z-10">
         <div className="overflow-x-auto">
           <div className="flex gap-2 min-w-max">
@@ -275,8 +311,9 @@ export default function PainelAdmin() {
               { id: "home", label: "📊 VISÃO GERAL", color: "blue" },
               { id: "radar", label: "📡 RADAR SOCIAL", color: "purple" },
               { id: "votacao", label: "🎵 VOTAÇÃO", color: "green" },
+              { id: "drinks", label: "🍻 DRINKS", color: "orange" },
               { id: "sorteio", label: "🎁 SORTEIO", color: "yellow" },
-              { id: "usuarios", label: "👥 USUÁRIOS", color: "orange" }
+              { id: "usuarios", label: "👥 USUÁRIOS", color: "cyan" }
             ].map((item) => (
               <button
                 key={item.id}
@@ -316,16 +353,47 @@ export default function PainelAdmin() {
                   <div className="text-2xl font-bold text-green-300">{totalVotos}</div>
                   <div className="text-xs text-green-200 font-mono">VOTOS</div>
                 </div>
-                <div className="glass p-3 rounded-lg text-center bg-yellow-900/20 border border-yellow-500/30">
-                  <div className="text-2xl font-bold text-yellow-300">{usuarios.length}</div>
-                  <div className="text-xs text-yellow-200 font-mono">USUÁRIOS</div>
+                <div className="glass p-3 rounded-lg text-center bg-orange-900/20 border border-orange-500/30">
+                  <div className="text-2xl font-bold text-orange-300">{totalDrinks}</div>
+                  <div className="text-xs text-orange-200 font-mono">DRINKS</div>
                 </div>
               </div>
             </div>
 
-            {/* Top 3 Mesas Mais Ativas */}
+            {/* Estatísticas de Drinks */}
             <div className="glass-dark rounded-xl p-4 border border-orange-500/30">
               <h2 className="font-orbitron font-bold text-orange-300 mb-3 text-sm">
+                🍻 SISTEMA DE DRINKS
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="glass p-2 rounded-lg text-center">
+                  <div className="text-lg font-bold text-green-300">{estatisticasDrinks.aceitos}</div>
+                  <div className="text-xs text-green-200 font-mono">ACEITOS</div>
+                </div>
+                <div className="glass p-2 rounded-lg text-center">
+                  <div className="text-lg font-bold text-red-300">{estatisticasDrinks.recusados}</div>
+                  <div className="text-xs text-red-200 font-mono">RECUSADOS</div>
+                </div>
+                <div className="glass p-2 rounded-lg text-center">
+                  <div className="text-lg font-bold text-yellow-300">{estatisticasDrinks.pendentes}</div>
+                  <div className="text-xs text-yellow-200 font-mono">PENDENTES</div>
+                </div>
+                <div className="glass p-2 rounded-lg text-center">
+                  <div className="text-lg font-bold text-purple-300">{estatisticasDrinks.anonimos}</div>
+                  <div className="text-xs text-purple-200 font-mono">ANÔNIMOS</div>
+                </div>
+              </div>
+              <div className="mt-3 text-center">
+                <div className="text-lg font-bold text-orange-300">
+                  R$ {estatisticasDrinks.valorTotal}
+                </div>
+                <div className="text-xs text-orange-200 font-mono">VALOR TOTAL</div>
+              </div>
+            </div>
+
+            {/* Top 3 Mesas Mais Ativas */}
+            <div className="glass-dark rounded-xl p-4 border border-cyan-500/30">
+              <h2 className="font-orbitron font-bold text-cyan-300 mb-3 text-sm">
                 🔥 TOP 3 MESAS MAIS ATIVAS
               </h2>
               {mesasAtivas.length === 0 ? (
@@ -356,8 +424,8 @@ export default function PainelAdmin() {
             </div>
 
             {/* Usuários Online */}
-            <div className="glass-dark rounded-xl p-4 border border-cyan-500/30">
-              <h2 className="font-orbitron font-bold text-neon mb-3 text-sm flex items-center gap-2">
+            <div className="glass-dark rounded-xl p-4 border border-yellow-500/30">
+              <h2 className="font-orbitron font-bold text-yellow-300 mb-3 text-sm flex items-center gap-2">
                 👥 ENTIDADES CONECTADAS
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               </h2>
@@ -378,7 +446,6 @@ export default function PainelAdmin() {
                       </div>
                       <div className="text-xs text-gray-300">
                         <p><span className="text-gray-400">STATUS:</span> {u.status}</p>
-                        {/* Removido indicador de entrada via QR */}
                       </div>
                     </div>
                   ))}
@@ -393,9 +460,94 @@ export default function PainelAdmin() {
           </div>
         )}
 
-        {/* Seção QR Code removida completamente */}
+        {/* Seção de Drinks */}
+        {tela === "drinks" && (
+          <div className="space-y-4">
+            {/* Estatísticas Detalhadas de Drinks */}
+            <div className="glass-dark rounded-xl p-4 border border-orange-500/30">
+              <h2 className="font-orbitron font-bold text-orange-300 mb-4 text-center text-sm">
+                🍻 ANÁLISE COMPLETA DE DRINKS
+              </h2>
+              
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="glass-blue p-3 rounded-lg text-center">
+                  <div className="text-xl font-bold text-green-300">{estatisticasDrinks.aceitos}</div>
+                  <div className="text-xs text-green-200 font-mono">ACEITOS</div>
+                </div>
+                <div className="glass p-3 rounded-lg text-center bg-red-900/20 border border-red-500/30">
+                  <div className="text-xl font-bold text-red-300">{estatisticasDrinks.recusados}</div>
+                  <div className="text-xs text-red-200 font-mono">RECUSADOS</div>
+                </div>
+                <div className="glass p-3 rounded-lg text-center bg-yellow-900/20 border border-yellow-500/30">
+                  <div className="text-xl font-bold text-yellow-300">{estatisticasDrinks.pendentes}</div>
+                  <div className="text-xs text-yellow-200 font-mono">PENDENTES</div>
+                </div>
+              </div>
 
-        {/* Outras telas mantidas iguais... */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="glass p-3 rounded-lg text-center bg-purple-900/20 border border-purple-500/30">
+                  <div className="text-xl font-bold text-purple-300">{estatisticasDrinks.anonimos}</div>
+                  <div className="text-xs text-purple-200 font-mono">ANÔNIMOS</div>
+                </div>
+                <div className="glass p-3 rounded-lg text-center bg-green-900/20 border border-green-500/30">
+                  <div className="text-xl font-bold text-green-300">R$ {estatisticasDrinks.valorTotal}</div>
+                  <div className="text-xs text-green-200 font-mono">VALOR TOTAL</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Últimos Drinks */}
+            <div className="glass-dark rounded-xl p-4 border border-blue-500/30">
+              <h3 className="font-orbitron font-bold text-blue-300 mb-3 text-center text-xs">
+                📊 ÚLTIMOS DRINKS
+              </h3>
+              
+              {drinks.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-2 opacity-30">🍻</div>
+                  <p className="text-gray-400 text-xs font-mono">NENHUM DRINK REGISTRADO</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {drinks.slice(0, 15).map((drink) => (
+                    <div key={drink.id} className="glass p-3 rounded-lg border border-gray-600/30">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="text-lg">{drink.drinkEmoji}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-white truncate">
+                              {drink.drinkNome} • R$ {drink.preco}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {drink.anonimo ? "🎭 Anônimo" : drink.de} → {drink.para}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="text-right flex-shrink-0">
+                          <span className={`text-xs font-mono px-2 py-1 rounded-full ${
+                            drink.status === "aceito" ? "bg-green-500/30 text-green-300" :
+                            drink.status === "recusado" ? "bg-red-500/30 text-red-300" :
+                            "bg-yellow-500/30 text-yellow-300"
+                          }`}>
+                            {drink.status === "aceito" ? "✅" :
+                             drink.status === "recusado" ? "❌" : "⏳"}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-xs text-gray-500">
+                        Mesa {drink.mesaDe} → Mesa {drink.mesaPara}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Outras seções mantidas iguais... */}
         {tela === "radar" && (
           <div className="space-y-4">
             {/* Análise de Atividade por Mesa */}
@@ -519,6 +671,9 @@ export default function PainelAdmin() {
                 )}
                 {totalVotos > usuarios.length * 0.5 && (
                   <p className="glass p-2 rounded">🎵 Boa participação na votação musical!</p>
+                )}
+                {totalDrinks > usuarios.length * 0.3 && (
+                  <p className="glass p-2 rounded">🍻 Sistema de drinks está sendo bem utilizado!</p>
                 )}
               </div>
             </div>
@@ -704,7 +859,6 @@ export default function PainelAdmin() {
                         <p><span className="text-gray-400">INTERESSES:</span> {u.interesses}</p>
                       )}
                       <p><span className="text-gray-400">CONEXÃO:</span> {u.timestamp?.toDate?.().toLocaleString() || 'N/A'}</p>
-                      {/* Removido indicador de entrada via QR */}
                     </div>
                   </div>
                 ))}

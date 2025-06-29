@@ -72,11 +72,11 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen min-h-dvh text-white relative max-w-md mx-auto bg-black/20">
       {/* Header futurístico mobile-first */}
       <div className="glass-dark border-b border-cyan-500/30 p-3 sticky top-0 z-50">
         <div className="text-center mb-3">
-          <h1 className="font-orbitron text-2xl font-bold text-neon">
+          <h1 className="font-orbitron text-xl font-bold text-neon">
             CHATBAR
           </h1>
           <div className="text-xs text-cyan-300 mt-1">
@@ -86,7 +86,7 @@ function App() {
 
         {/* Navegação mobile otimizada com scroll horizontal */}
         <div className="overflow-x-auto">
-          <div className="flex gap-2 min-w-max px-2">
+          <div className="flex gap-2 min-w-max px-1">
             <button
               className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
                 telaAtual === "chat" 
@@ -158,7 +158,7 @@ function App() {
       </div>
 
       {/* Conteúdo principal com padding mobile e z-index para ficar acima do background */}
-      <div className="p-3 pb-20 relative z-10">
+      <div className="p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)]">
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}

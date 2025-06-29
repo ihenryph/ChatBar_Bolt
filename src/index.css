@@ -13,76 +13,168 @@
 body {
   margin: 0;
   font-family: 'Exo 2', 'Segoe UI', sans-serif;
-  background: #0a0a0a;
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+  background-attachment: fixed;
   color: #fff;
   overflow-x: hidden;
   min-height: 100vh;
 }
 
+/* Efeito de partículas de fundo */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Efeito de scan lines */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 255, 0.03) 2px,
+    rgba(0, 255, 255, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: scanlines 2s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
 /* Classes utilitárias para efeitos de vidro */
 .glass {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .glass-dark {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glass-blue {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(59, 130, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Efeitos de hover otimizados para mobile */
+/* Efeitos de hover futurísticos */
 .hover-glow {
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
+}
+
+.hover-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+  z-index: -1;
 }
 
 @media (hover: hover) {
+  .hover-glow:hover::before {
+    opacity: 1;
+  }
+
   .hover-glow:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px rgba(0, 255, 255, 0.2),
+      0 0 20px rgba(0, 255, 255, 0.1);
   }
 }
 
-/* Botões futurísticos otimizados para mobile */
+/* Botões futurísticos */
 .btn-futuristic {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.8));
   border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   color: white;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   min-height: 44px; /* Tamanho mínimo para touch */
+}
+
+.btn-futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+@media (hover: hover) {
+  .btn-futuristic:hover::before {
+    left: 100%;
+  }
+
+  .btn-futuristic:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 10px 30px rgba(59, 130, 246, 0.4),
+      0 0 20px rgba(147, 51, 234, 0.3);
+  }
 }
 
 .btn-futuristic:active {
   transform: scale(0.98);
 }
 
-/* Inputs futurísticos otimizados para mobile */
+/* Inputs futurísticos */
 .input-futuristic {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   color: white;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   min-height: 44px; /* Tamanho mínimo para touch */
   font-size: 16px; /* Evita zoom no iOS */
 }
@@ -90,33 +182,67 @@ body {
 .input-futuristic:focus {
   outline: none;
   border-color: rgba(0, 255, 255, 0.8);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 255, 255, 0.1);
 }
 
 .input-futuristic::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* Animações futurísticas */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes matrix-rain {
+  0% { transform: translateY(-100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
 /* Efeito de texto neon */
 .text-neon {
   color: #00ffff;
   text-shadow: 
-    0 0 3px #00ffff,
-    0 0 6px #00ffff,
-    0 0 9px #00ffff;
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 15px #00ffff,
+    0 0 20px #00ffff;
 }
 
 .text-neon-pink {
   color: #ff00ff;
   text-shadow: 
-    0 0 3px #ff00ff,
-    0 0 6px #ff00ff,
-    0 0 9px #ff00ff;
+    0 0 5px #ff00ff,
+    0 0 10px #ff00ff,
+    0 0 15px #ff00ff,
+    0 0 20px #ff00ff;
 }
 
 /* Scrollbar personalizada */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -127,16 +253,22 @@ body {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(45deg, #00ffff, #ff00ff);
   border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
-/* Loading spinner otimizado */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+}
+
+/* Efeito de loading futurístico */
 .loading-spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(0, 255, 255, 0.3);
-  border-top: 2px solid #00ffff;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 255, 255, 0.3);
+  border-top: 3px solid #00ffff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
 }
 
 @keyframes spin {
@@ -144,61 +276,34 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Animações otimizadas */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-  }
-}
-
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-}
-
-.float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Fonte para títulos */
-.font-orbitron {
-  font-family: 'Orbitron', monospace;
-}
-
-/* Efeito de hologram simplificado */
-.hologram {
-  background: linear-gradient(
-    45deg,
-    rgba(0, 255, 255, 0.1) 0%,
-    rgba(255, 0, 255, 0.1) 50%,
-    rgba(0, 255, 255, 0.1) 100%
-  );
+/* Efeito de borda animada */
+.border-animated {
+  position: relative;
+  background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
   background-size: 200% 200%;
-  animation: hologram-shift 3s ease-in-out infinite;
+  animation: gradient-shift 3s ease infinite;
 }
 
-@keyframes hologram-shift {
-  0%, 100% { background-position: 0% 50%; }
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Otimizações específicas para mobile */
+/* Responsividade */
 @media (max-width: 768px) {
   .glass, .glass-dark, .glass-blue {
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   
-  /* Reduzir animações em dispositivos móveis */
+  /* Reduzir animações em dispositivos móveis para performance */
   .hover-glow:hover {
-    transform: none;
+    transform: translateY(-1px);
+  }
+  
+  .btn-futuristic:hover {
+    transform: translateY(-1px);
   }
   
   /* Melhor espaçamento para touch */
@@ -209,19 +314,52 @@ body {
   /* Texto mais legível em telas pequenas */
   .text-neon, .text-neon-pink {
     text-shadow: 
-      0 0 2px currentColor,
-      0 0 4px currentColor;
+      0 0 3px currentColor,
+      0 0 6px currentColor,
+      0 0 9px currentColor;
+  }
+  
+  /* Loading spinner menor para mobile */
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-top: 2px solid #00ffff;
   }
 }
 
-/* Otimizações para telas muito pequenas */
+/* Fonte para títulos */
+.font-orbitron {
+  font-family: 'Orbitron', monospace;
+}
+
+/* Efeito de hologram */
+.hologram {
+  background: linear-gradient(
+    45deg,
+    rgba(0, 255, 255, 0.1) 0%,
+    rgba(255, 0, 255, 0.1) 25%,
+    rgba(0, 255, 255, 0.1) 50%,
+    rgba(255, 0, 255, 0.1) 75%,
+    rgba(0, 255, 255, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  animation: hologram-shift 4s ease-in-out infinite;
+}
+
+@keyframes hologram-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Otimizações específicas para mobile */
 @media (max-width: 480px) {
   .font-orbitron {
     letter-spacing: 0.5px;
   }
   
   .btn-futuristic {
-    letter-spacing: 0.25px;
+    letter-spacing: 0.5px;
     font-size: 14px;
   }
 }
@@ -232,5 +370,11 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  
+  /* Manter apenas animações essenciais */
+  .pulse-glow, .loading-spinner {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
   }
 }

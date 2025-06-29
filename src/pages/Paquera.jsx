@@ -64,6 +64,7 @@ export default function Paquera({ user }) {
       curtidasRecebidas.includes(pessoa)
     );
     setMatches(m);
+    console.log("🔥 Matches atualizados:", m); // Debug
   }, [curtidasFeitas, curtidasRecebidas]);
 
   const handleCurtir = async (alvo) => {
@@ -83,6 +84,7 @@ export default function Paquera({ user }) {
   };
 
   const abrirChatPrivado = (nomeMatch) => {
+    console.log("💬 Abrindo chat privado com:", nomeMatch); // Debug
     setChatPrivadoAberto(nomeMatch);
   };
 
@@ -137,6 +139,10 @@ export default function Paquera({ user }) {
         <p className="text-gray-300 text-xs font-mono">
           Sistema de Conexões • Protocolo Anônimo
         </p>
+        {/* Debug info */}
+        <div className="text-xs text-gray-500 mt-2">
+          Curtidas feitas: {curtidasFeitas.length} | Recebidas: {curtidasRecebidas.length} | Matches: {matches.length}
+        </div>
       </div>
 
       {/* Matches */}
@@ -223,8 +229,8 @@ export default function Paquera({ user }) {
                           Mesa {u.table}
                         </div>
                         {isMatch && (
-                          <div className="bg-pink-500/30 px-2 py-1 rounded-full text-xs font-bold text-pink-300 border border-pink-400/50 flex-shrink-0">
-                            MATCH!
+                          <div className="bg-pink-500/30 px-2 py-1 rounded-full text-xs font-bold text-pink-300 border border-pink-400/50 flex-shrink-0 animate-pulse">
+                            MATCH! 🔥
                           </div>
                         )}
                       </div>
@@ -247,7 +253,7 @@ export default function Paquera({ user }) {
                       {isMatch ? (
                         <button
                           onClick={() => abrirChatPrivado(u.name)}
-                          className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-2 rounded-full font-bold text-xs animate-pulse"
+                          className="btn-futuristic bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-2 rounded-full font-bold text-xs animate-pulse hover-glow"
                         >
                           💬 CHAT
                         </button>
@@ -259,7 +265,7 @@ export default function Paquera({ user }) {
                             jaCurtiu
                               ? "bg-gray-600/50 cursor-not-allowed text-gray-400 border border-gray-500/30"
                               : recebeuCurtida
-                              ? "btn-futuristic bg-gradient-to-r from-purple-600 to-pink-600"
+                              ? "btn-futuristic bg-gradient-to-r from-purple-600 to-pink-600 animate-pulse"
                               : "btn-futuristic"
                           }`}
                         >

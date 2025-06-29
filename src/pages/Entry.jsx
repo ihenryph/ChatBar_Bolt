@@ -102,7 +102,7 @@ export default function Entry({ onEnter }) {
             <div className="relative">
               <input
                 type="text"
-                placeholder="SETOR [MESA]"
+                placeholder="Mesa"
                 className="input-futuristic w-full p-3 rounded-xl font-medium"
                 value={table}
                 onChange={(e) => setTable(e.target.value)}

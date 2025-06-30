@@ -125,7 +125,7 @@ export default function Entry({ onEnter }) {
           </h1>
           <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>
           <p className="text-gray-300 mt-3 text-sm">
-            Entretenimento Casual
+            "Escaneou, conversou. Simples assim!"
           </p>
         </div>
 

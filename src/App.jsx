@@ -85,12 +85,12 @@ function App() {
           </div>
         </div>
 
-        {/* Navegação mobile em 2 linhas */}
+        {/* Navegação mobile em 2 linhas com alinhamento corrigido */}
         <div className="space-y-2">
           {/* Primeira linha - Funcionalidades principais */}
-          <div className="flex gap-2 justify-center">
+          <div className="grid grid-cols-4 gap-2">
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "chat" 
                   ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
                   : "text-gray-300 hover:text-cyan-300"
@@ -100,7 +100,7 @@ function App() {
               💬 Chat
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "radar" 
                   ? "bg-yellow-500/30 text-yellow-300 border border-yellow-400/50" 
                   : "text-gray-300 hover:text-yellow-300"
@@ -110,7 +110,7 @@ function App() {
               📡 Radar
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "votacao" 
                   ? "bg-green-500/30 text-green-300 border border-green-400/50" 
                   : "text-gray-300 hover:text-green-300"
@@ -120,7 +120,7 @@ function App() {
               🎵 Música
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "drinks" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
                   : "text-gray-300 hover:text-purple-300"
@@ -132,9 +132,9 @@ function App() {
           </div>
 
           {/* Segunda linha - Funcionalidades secundárias */}
-          <div className="flex gap-2 justify-center">
+          <div className="grid grid-cols-4 gap-2">
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "paquera" 
                   ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
                   : "text-gray-300 hover:text-rose-300"
@@ -144,7 +144,7 @@ function App() {
               💘 Paquera
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "sorteio" 
                   ? "bg-pink-500/30 text-pink-300 border border-pink-400/50" 
                   : "text-gray-300 hover:text-pink-300"
@@ -154,7 +154,7 @@ function App() {
               🎁 Sorteio
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-2 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow text-center ${
                 telaAtual === "perfil" 
                   ? "bg-blue-500/30 text-blue-300 border border-blue-400/50" 
                   : "text-gray-300 hover:text-blue-300"
@@ -164,7 +164,7 @@ function App() {
               👤 Perfil
             </button>
             <button
-              className="px-3 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 flex-1 max-w-[80px]"
+              className="px-2 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 text-center"
               onClick={handleLogout}
             >
               🚪 Sair

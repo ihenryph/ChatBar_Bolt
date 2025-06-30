@@ -110,7 +110,7 @@ function App() {
               📡 Radar
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "votacao" 
                   ? "bg-green-500/30 text-green-300 border border-green-400/50" 
                   : "text-gray-300 hover:text-green-300"
@@ -120,7 +120,7 @@ function App() {
               🎵 Música
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "drinks" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
                   : "text-gray-300 hover:text-purple-300"
@@ -134,7 +134,7 @@ function App() {
           {/* Segunda linha - Funcionalidades secundárias */}
           <div className="flex gap-2 justify-center">
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "paquera" 
                   ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
                   : "text-gray-300 hover:text-rose-300"
@@ -144,7 +144,7 @@ function App() {
               💘 Paquera
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "sorteio" 
                   ? "bg-pink-500/30 text-pink-300 border border-pink-400/50" 
                   : "text-gray-300 hover:text-pink-300"
@@ -154,7 +154,7 @@ function App() {
               🎁 Sorteio
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "perfil" 
                   ? "bg-blue-500/30 text-blue-300 border border-blue-400/50" 
                   : "text-gray-300 hover:text-blue-300"
@@ -164,7 +164,7 @@ function App() {
               👤 Perfil
             </button>
             <button
-              className="px-3 py-2 rounded-full text-xs font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30 flex-1 max-w-[80px]"
+              className="px-3 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30 flex-1 max-w-[80px]"
               onClick={handleLogout}
             >
               🚪 Sair

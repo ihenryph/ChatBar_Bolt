@@ -101,20 +101,7 @@ export default function Entry({ onEnter }) {
       )} */}
 
       {/* Efeito de partículas flutuantes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
+      
 
       {/* Container principal mobile-first */}
       <div className="glass-dark rounded-2xl p-6 w-full max-w-sm relative z-5 border-animated">

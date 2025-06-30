@@ -326,7 +326,7 @@ export default function PainelAdmin() {
               }`}
               onClick={() => setTela("radar")}
             >
-              📡 RADAR SOCIAL
+              📡 Radar Social
             </button>
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
@@ -336,7 +336,7 @@ export default function PainelAdmin() {
               }`}
               onClick={() => setTela("votacao")}
             >
-              🎵 VOTAÇÃO
+              🎵 Votação
             </button>
           </div>
 
@@ -350,7 +350,7 @@ export default function PainelAdmin() {
               }`}
               onClick={() => setTela("drinks")}
             >
-              🍻 DRINKS
+              🍻 Drinks
             </button>
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
@@ -360,7 +360,7 @@ export default function PainelAdmin() {
               }`}
               onClick={() => setTela("sorteio")}
             >
-              🎁 SORTEIO
+              🎁 Sorteio
             </button>
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
@@ -370,7 +370,7 @@ export default function PainelAdmin() {
               }`}
               onClick={() => setTela("usuarios")}
             >
-              👥 USUÁRIOS
+              👥 Usuários
             </button>
           </div>
         </div>
@@ -383,7 +383,7 @@ export default function PainelAdmin() {
             {/* Estatísticas Gerais */}
             <div className="glass-dark rounded-xl p-4 border border-purple-500/30">
               <h2 className="font-orbitron font-bold text-neon-pink mb-4 text-center text-sm">
-                📊 MÉTRICAS DO SISTEMA
+                📊 Métricas do Sistema
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 <div className="glass-blue p-3 rounded-lg text-center">

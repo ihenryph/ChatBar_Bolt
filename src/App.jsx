@@ -85,11 +85,12 @@ function App() {
           </div>
         </div>
 
-        {/* Navegação mobile otimizada com scroll horizontal */}
-        <div className="overflow-x-auto">
-          <div className="flex gap-2 min-w-max px-1">
+        {/* Navegação mobile em 2 linhas */}
+        <div className="space-y-2">
+          {/* Primeira linha - Funcionalidades principais */}
+          <div className="flex gap-2 justify-center">
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "chat" 
                   ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
                   : "text-gray-300 hover:text-cyan-300"
@@ -99,7 +100,7 @@ function App() {
               💬 Chat
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "radar" 
                   ? "bg-yellow-500/30 text-yellow-300 border border-yellow-400/50" 
                   : "text-gray-300 hover:text-yellow-300"
@@ -109,17 +110,17 @@ function App() {
               📡 Radar
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "votacao" 
                   ? "bg-green-500/30 text-green-300 border border-green-400/50" 
                   : "text-gray-300 hover:text-green-300"
               }`}
               onClick={() => setTelaAtual("votacao")}
             >
-              🎵 Votação
+              🎵 Música
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "drinks" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
                   : "text-gray-300 hover:text-purple-300"
@@ -128,8 +129,12 @@ function App() {
             >
               🍻 Drinks
             </button>
+          </div>
+
+          {/* Segunda linha - Funcionalidades secundárias */}
+          <div className="flex gap-2 justify-center">
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "paquera" 
                   ? "bg-rose-500/30 text-rose-300 border border-rose-400/50" 
                   : "text-gray-300 hover:text-rose-300"
@@ -139,7 +144,7 @@ function App() {
               💘 Paquera
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "sorteio" 
                   ? "bg-pink-500/30 text-pink-300 border border-pink-400/50" 
                   : "text-gray-300 hover:text-pink-300"
@@ -149,7 +154,7 @@ function App() {
               🎁 Sorteio
             </button>
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow whitespace-nowrap ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "perfil" 
                   ? "bg-blue-500/30 text-blue-300 border border-blue-400/50" 
                   : "text-gray-300 hover:text-blue-300"
@@ -159,7 +164,7 @@ function App() {
               👤 Perfil
             </button>
             <button
-              className="px-3 py-2 rounded-full text-xs font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30 whitespace-nowrap"
+              className="px-3 py-2 rounded-full text-xs font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border border-red-500/30 flex-1 max-w-[80px]"
               onClick={handleLogout}
             >
               🚪 Sair
@@ -169,7 +174,7 @@ function App() {
       </div>
 
       {/* Conteúdo principal com padding mobile e z-index para ficar acima do background */}
-      <div className="p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)]">
+      <div className="p-3 pb-20 relative z-10 min-h-[calc(100vh-140px)] min-h-[calc(100dvh-140px)]">
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}

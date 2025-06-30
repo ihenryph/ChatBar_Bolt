@@ -123,7 +123,7 @@ export default function Entry({ onEnter }) {
           <h1 className="font-orbitron text-4xl font-bold text-neon mb-4">
             CHATBAR
           </h1>
-          <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>
+          
           <p className="text-gray-300 mt-3 text-sm">
             "Escaneou, conversou. Simples assim!"
           </p>

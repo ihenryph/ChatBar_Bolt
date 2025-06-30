@@ -268,7 +268,7 @@ export default function PainelAdmin() {
   const usuariosComprometidos = usuarios.filter(u => u.status === "Comprometido" || u.status === "Casado").length;
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative max-w-md mx-auto bg-black/20">
       {/* Efeito de partículas de fundo */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(30)].map((_, i) => (
@@ -303,30 +303,75 @@ export default function PainelAdmin() {
         </button>
       </header>
 
-      {/* Navegação */}
+      {/* Navegação em 2 linhas */}
       <nav className="glass p-3 m-3 rounded-xl relative z-10">
-        <div className="overflow-x-auto">
-          <div className="flex gap-2 min-w-max">
-            {[
-              { id: "home", label: "📊 VISÃO GERAL", color: "blue" },
-              { id: "radar", label: "📡 RADAR SOCIAL", color: "purple" },
-              { id: "votacao", label: "🎵 VOTAÇÃO", color: "green" },
-              { id: "drinks", label: "🍻 DRINKS", color: "orange" },
-              { id: "sorteio", label: "🎁 SORTEIO", color: "yellow" },
-              { id: "usuarios", label: "👥 USUÁRIOS", color: "cyan" }
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 whitespace-nowrap hover-glow ${
-                  tela === item.id 
-                    ? `bg-${item.color}-500/30 text-${item.color}-300 border border-${item.color}-400/50` 
-                    : "text-gray-300 bg-gray-800/50 hover:text-white"
-                }`}
-                onClick={() => setTela(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
+        <div className="space-y-2">
+          {/* Primeira linha - Funcionalidades principais */}
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "home" 
+                  ? "bg-blue-500/30 text-blue-300 border border-blue-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("home")}
+            >
+              📊 VISÃO GERAL
+            </button>
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "radar" 
+                  ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("radar")}
+            >
+              📡 RADAR SOCIAL
+            </button>
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "votacao" 
+                  ? "bg-green-500/30 text-green-300 border border-green-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("votacao")}
+            >
+              🎵 VOTAÇÃO
+            </button>
+          </div>
+
+          {/* Segunda linha - Funcionalidades secundárias */}
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "drinks" 
+                  ? "bg-orange-500/30 text-orange-300 border border-orange-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("drinks")}
+            >
+              🍻 DRINKS
+            </button>
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "sorteio" 
+                  ? "bg-yellow-500/30 text-yellow-300 border border-yellow-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("sorteio")}
+            >
+              🎁 SORTEIO
+            </button>
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "usuarios" 
+                  ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("usuarios")}
+            >
+              👥 USUÁRIOS
+            </button>
           </div>
         </div>
       </nav>

@@ -164,7 +164,7 @@ function App() {
               👤 Perfil
             </button>
             <button
-              className="px-3 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 border flex-1 max-w-[80px]"
+              className="px-3 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 flex-1 max-w-[80px]"
               onClick={handleLogout}
             >
               🚪 Sair

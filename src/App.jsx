@@ -90,7 +90,7 @@ function App() {
           {/* Primeira linha - Funcionalidades principais */}
           <div className="flex gap-2 justify-center">
             <button
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover-glow flex-1 max-w-[80px] ${
                 telaAtual === "chat" 
                   ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
                   : "text-gray-300 hover:text-cyan-300"

@@ -74,8 +74,8 @@ function App() {
 
   return (
     <div className="min-h-screen min-h-dvh text-white relative max-w-md mx-auto bg-black/20">
-      {/* Header e Menu fixos */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50 bg-black/80 backdrop-blur-md">
+      {/* Header e Menu fixos - removido fundo preto e ajustado transparência */}
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
         {/* Header futurístico mobile-first */}
         <div className="glass-dark border-b border-cyan-500/30 p-3">
           <div className="text-center mb-3">
@@ -176,8 +176,8 @@ function App() {
         </div>
       </div>
 
-      {/* Conteúdo principal com padding-top para compensar o header fixo */}
-      <div className="pt-[140px] p-3 pb-20 relative z-10 min-h-[calc(100vh-140px)] min-h-[calc(100dvh-140px)]">
+      {/* Conteúdo principal com padding-top reduzido para compensar o header fixo */}
+      <div className="pt-[120px] p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)]">
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}

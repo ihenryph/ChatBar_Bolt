@@ -288,7 +288,7 @@ export default function PainelAdmin() {
       {/* Header Administrativo */}
       <header className="glass-dark border-b border-red-500/30 p-4 sticky top-0 z-50">
         <div className="text-center">
-          <h1 className="font-orbitron text-xl font-bold text-neon mb-1">
+          <h1 className="font-orbitron text-xl font-bold  mb-1">
             PAINEL DE CONTROLE
           </h1>
           <p className="text-red-300 font-mono text-xs">

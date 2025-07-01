@@ -291,9 +291,9 @@ export default function PainelAdmin() {
           <h1 className="font-orbitron text-xl font-bold  mb-1">
             PAINEL DE CONTROLE
           </h1>
-          <p className="text-red-300 font-mono text-xs">
+          {/* <p className="text-red-300 font-mono text-xs">
             SISTEMA ADMINISTRATIVO • ACESSO RESTRITO
-          </p>
+          </p> */}
         </div>
         <button
           className="btn-futuristic bg-gradient-to-r from-red-600 to-pink-600 px-4 py-2 rounded-lg font-bold text-xs mt-3 w-full"

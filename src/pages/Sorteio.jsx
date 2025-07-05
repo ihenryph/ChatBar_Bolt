@@ -29,7 +29,26 @@ export default function Sorteio({ user }) {
         const novosParticipantes = data.participantes || [];
         const novoGanhador = data.ganhador || null;
         
-        // Detectar se há um novo ganhador
+        // DETECTAR REINÍCIO DO SORTEIO - Se não há ganhador e havia antes, foi reiniciado
+        if (!novoGanhador && ganhador) {
+          console.log("🔄 Sorteio reiniciado pelo admin - removendo notificações");
+          // Remover TODAS as notificações instantaneamente
+          setShowCelebration(false);
+          setShowLoseMessage(false);
+          setIsWinner(false);
+          setGanhador(null);
+          setParticipantes(novosParticipantes);
+          setHistorico(data.historico || []);
+          
+          // Verificar se o usuário já está participando
+          const jaEstaParticipando = novosParticipantes.some(
+            p => p.name === user.name && p.table === user.table
+          );
+          setJaParticipando(jaEstaParticipando);
+          return; // Sair da função para não processar mais nada
+        }
+        
+        // Detectar se há um novo ganhador (apenas se não havia ganhador antes)
         if (novoGanhador && !ganhador) {
           console.log("🏆 Novo ganhador detectado:", novoGanhador);
           
@@ -73,7 +92,7 @@ export default function Sorteio({ user }) {
     });
 
     return () => unsubscribe();
-  }, [user, ganhador]);
+  }, [user, ganhador]); // Manter ganhador como dependência para detectar mudanças
 
   const celebrarVitoria = () => {
     // Tocar som de vitória

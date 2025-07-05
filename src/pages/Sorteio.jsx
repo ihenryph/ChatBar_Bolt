@@ -57,7 +57,7 @@ export default function Sorteio({ user }) {
           setIsWinner(euSouOGanhador);
           
           if (euSouOGanhador) {
-            // Animação de vitória para o ganhador
+            // APENAS O GANHADOR recebe confete e animação de vitória
             celebrarVitoria();
           } else {
             // Verificar se o usuário estava participando
@@ -67,7 +67,7 @@ export default function Sorteio({ user }) {
             
             if (estavaPariticipando) {
               // Mostrar mensagem de "não foi dessa vez" para quem participou mas não ganhou
-              mostrarMensagemDerrota();
+              mostrarMensagemDerrota(novoGanhador.name);
             }
           }
         }
@@ -95,16 +95,16 @@ export default function Sorteio({ user }) {
   }, [user, ganhador]); // Manter ganhador como dependência para detectar mudanças
 
   const celebrarVitoria = () => {
-    // Tocar som de vitória
+    // Tocar som de vitória APENAS para o ganhador
     const audio = new Audio("/sounds/curtida.mp3");
     audio.play().catch(() => {
       console.log("Não foi possível tocar o som");
     });
 
-    // Mostrar animação de celebração para o ganhador
+    // Mostrar animação de celebração APENAS para o ganhador
     setShowCelebration(true);
 
-    // Disparar confete múltiplas vezes
+    // Disparar confete múltiplas vezes APENAS para o ganhador
     const duration = 5000; // 5 segundos
     const end = Date.now() + duration;
 
@@ -149,16 +149,16 @@ export default function Sorteio({ user }) {
     }, 5000);
   };
 
-  const mostrarMensagemDerrota = () => {
+  const mostrarMensagemDerrota = (nomeGanhador) => {
     // Tocar som mais suave para derrota
     const audio = new Audio("/sounds/curtida.mp3");
-    audio.volume = 0.3; // Volume mais baixo
+    audio.volume = 0.2; // Volume bem baixo
     audio.play().catch(() => {
       console.log("Não foi possível tocar o som");
     });
 
-    // Mostrar mensagem de "não foi dessa vez"
-    setShowLoseMessage(true);
+    // Mostrar mensagem de "não foi dessa vez" com nome do ganhador
+    setShowLoseMessage(nomeGanhador);
 
     // Remover mensagem após 4 segundos
     setTimeout(() => {
@@ -198,7 +198,7 @@ export default function Sorteio({ user }) {
 
   return (
     <div className="space-y-4 relative">
-      {/* Overlay de celebração para GANHADORES */}
+      {/* Overlay de celebração APENAS para GANHADORES */}
       {showCelebration && isWinner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="text-center animate-bounce">
@@ -229,6 +229,14 @@ export default function Sorteio({ user }) {
                 NÃO FOI DESSA VEZ
               </h2>
               <div className="text-4xl mb-4">😞💔😢</div>
+              
+              {/* Nome do ganhador */}
+              <div className="glass-blue p-3 rounded-lg border border-gray-500/30 mb-4">
+                <p className="text-white text-lg font-mono">
+                  <span className="text-yellow-300 font-bold">{showLoseMessage}</span> ganhou!
+                </p>
+              </div>
+              
               <p className="text-gray-300 text-lg font-mono">
                 Mais sorte na próxima!
               </p>
@@ -259,13 +267,13 @@ export default function Sorteio({ user }) {
         </div>
       </div>
 
-      {/* Status do Ganhador */}
-      {ganhador && (
-        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30">
+      {/* Status do Ganhador - SEM "GANHADOR SORTEADO" para não-ganhadores */}
+      {ganhador && isWinner && (
+        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 animate-pulse">
           <div className="text-center">
-            <div className="text-6xl mb-4">🏆</div>
+            <div className="text-6xl mb-4 animate-bounce">🏆</div>
             <h3 className="font-orbitron text-xl font-bold text-yellow-300 mb-3">
-              GANHADOR SORTEADO!
+              VOCÊ GANHOU!
             </h3>
             <div className="glass-blue p-4 rounded-lg border-2 border-yellow-400/50">
               <p className="text-lg font-bold text-white mb-1">
@@ -276,25 +284,22 @@ export default function Sorteio({ user }) {
               </p>
             </div>
             
-            {/* Mensagem personalizada baseada se é o ganhador ou não */}
-            {isWinner ? (
-              <div className="mt-4 glass-blue p-3 rounded-lg border border-green-400/50 bg-green-900/20">
-                <p className="text-green-300 font-bold text-sm animate-pulse">
-                  🎉 VOCÊ É O GANHADOR! 🎉
-                </p>
-                <p className="text-xs text-gray-300 mt-1">
-                  Procure o garçom para retirar seu prêmio!
-                </p>
-              </div>
-            ) : (
-              <div className="flex justify-center gap-2 mt-4 text-2xl">
-                <span className="animate-bounce" style={{animationDelay: '0s'}}>🎉</span>
-                <span className="animate-bounce" style={{animationDelay: '0.1s'}}>🎊</span>
-                <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🎉</span>
-                <span className="animate-bounce" style={{animationDelay: '0.3s'}}>🎊</span>
-                <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🎉</span>
-              </div>
-            )}
+            <div className="mt-4 glass-blue p-3 rounded-lg border border-green-400/50 bg-green-900/20">
+              <p className="text-green-300 font-bold text-sm animate-pulse">
+                🎉 PARABÉNS! VOCÊ É O GANHADOR! 🎉
+              </p>
+              <p className="text-xs text-gray-300 mt-1">
+                Procure o garçom para retirar seu prêmio!
+              </p>
+            </div>
+            
+            <div className="flex justify-center gap-2 mt-4 text-2xl">
+              <span className="animate-bounce" style={{animationDelay: '0s'}}>🎉</span>
+              <span className="animate-bounce" style={{animationDelay: '0.1s'}}>🎊</span>
+              <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🎉</span>
+              <span className="animate-bounce" style={{animationDelay: '0.3s'}}>🎊</span>
+              <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🎉</span>
+            </div>
             
             <p className="text-gray-300 mt-3 text-sm font-mono">
               Sorteado entre {participantes.length} participantes!

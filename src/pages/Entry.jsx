@@ -182,9 +182,9 @@ export default function Entry({ onEnter }) {
                 disabled={loading}
               >
                 <option value="" className="bg-gray-800">STATUS RELACIONAL</option>
-                <option value="Solteiro" className="bg-gray-800">💚 SOLTEIRO</option>
-                <option value="Comprometido" className="bg-gray-800">💛 TO NA PISTA</option>
-                <option value="Casado" className="bg-gray-800">❤️ CASADO</option>
+                <option value="Solteiro" className="bg-gray-800">🔥 SOLTEIRO</option>
+                <option value="Comprometido" className="bg-gray-800">😈 TO NA PISTA</option>
+                <option value="Casado" className="bg-gray-800">☠️ CASADO</option>
               </select>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

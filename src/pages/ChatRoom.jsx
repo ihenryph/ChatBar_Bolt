@@ -77,9 +77,9 @@ export default function ChatRoom({ user, onLogout }) {
     <div className="space-y-3">
       {/* Header do Chat mobile */}
       <div className="glass-blue rounded-xl p-3 text-center">
-        <h2 className="font-orbitron text-lg font-bold text-neon mb-1">
+        {/*<h2 className="font-orbitron text-lg font-bold text-neon mb-1">
           CANAL DE COMUNICAÇÃO
-        </h2>
+        </h2>*/}
         <div className="flex items-center justify-center gap-3 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>

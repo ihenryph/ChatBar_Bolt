@@ -18,6 +18,8 @@ export default function Sorteio({ user }) {
   const [loading, setLoading] = useState(false);
   const [historico, setHistorico] = useState([]);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showLoseMessage, setShowLoseMessage] = useState(false);
+  const [isWinner, setIsWinner] = useState(false);
 
   useEffect(() => {
     // Observar dados do sorteio em tempo real
@@ -30,7 +32,25 @@ export default function Sorteio({ user }) {
         // Detectar se há um novo ganhador
         if (novoGanhador && !ganhador) {
           console.log("🏆 Novo ganhador detectado:", novoGanhador);
-          celebrarGanhador();
+          
+          // Verificar se o usuário atual é o ganhador
+          const euSouOGanhador = novoGanhador.name === user.name && novoGanhador.table === user.table;
+          setIsWinner(euSouOGanhador);
+          
+          if (euSouOGanhador) {
+            // Animação de vitória para o ganhador
+            celebrarVitoria();
+          } else {
+            // Verificar se o usuário estava participando
+            const estavaPariticipando = novosParticipantes.some(
+              p => p.name === user.name && p.table === user.table
+            );
+            
+            if (estavaPariticipando) {
+              // Mostrar mensagem de "não foi dessa vez" para quem participou mas não ganhou
+              mostrarMensagemDerrota();
+            }
+          }
         }
         
         setParticipantes(novosParticipantes);
@@ -55,14 +75,14 @@ export default function Sorteio({ user }) {
     return () => unsubscribe();
   }, [user, ganhador]);
 
-  const celebrarGanhador = () => {
+  const celebrarVitoria = () => {
     // Tocar som de vitória
     const audio = new Audio("/sounds/curtida.mp3");
     audio.play().catch(() => {
       console.log("Não foi possível tocar o som");
     });
 
-    // Mostrar animação de celebração
+    // Mostrar animação de celebração para o ganhador
     setShowCelebration(true);
 
     // Disparar confete múltiplas vezes
@@ -110,6 +130,23 @@ export default function Sorteio({ user }) {
     }, 5000);
   };
 
+  const mostrarMensagemDerrota = () => {
+    // Tocar som mais suave para derrota
+    const audio = new Audio("/sounds/curtida.mp3");
+    audio.volume = 0.3; // Volume mais baixo
+    audio.play().catch(() => {
+      console.log("Não foi possível tocar o som");
+    });
+
+    // Mostrar mensagem de "não foi dessa vez"
+    setShowLoseMessage(true);
+
+    // Remover mensagem após 4 segundos
+    setTimeout(() => {
+      setShowLoseMessage(false);
+    }, 4000);
+  };
+
   const handleParticipar = async () => {
     if (jaParticipando || loading) return;
 
@@ -142,8 +179,8 @@ export default function Sorteio({ user }) {
 
   return (
     <div className="space-y-4 relative">
-      {/* Overlay de celebração */}
-      {showCelebration && (
+      {/* Overlay de celebração para GANHADORES */}
+      {showCelebration && isWinner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="text-center animate-bounce">
             <div className="text-8xl mb-4 animate-spin">🏆</div>
@@ -153,7 +190,31 @@ export default function Sorteio({ user }) {
               </h2>
               <div className="text-6xl mb-4">🎉🎊🎉</div>
               <p className="text-white text-lg font-mono animate-pulse">
-                GANHADOR SORTEADO!
+                VOCÊ GANHOU!
+              </p>
+              <p className="text-yellow-300 text-sm font-mono mt-2">
+                Procure o garçom para retirar seu prêmio!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay de "não foi dessa vez" para PERDEDORES */}
+      {showLoseMessage && !isWinner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="text-center">
+            <div className="text-8xl mb-4 animate-pulse">😔</div>
+            <div className="glass-dark rounded-2xl p-6 border-4 border-gray-400/80 bg-gradient-to-r from-gray-900/90 to-slate-900/90">
+              <h2 className="font-orbitron text-2xl font-bold text-gray-300 mb-2">
+                NÃO FOI DESSA VEZ
+              </h2>
+              <div className="text-4xl mb-4">😞💔😢</div>
+              <p className="text-gray-300 text-lg font-mono">
+                Mais sorte na próxima!
+              </p>
+              <p className="text-gray-400 text-sm font-mono mt-2">
+                Continue participando dos próximos sorteios
               </p>
             </div>
           </div>
@@ -181,29 +242,43 @@ export default function Sorteio({ user }) {
 
       {/* Status do Ganhador */}
       {ganhador && (
-        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 animate-pulse">
+        <div className="glass rounded-xl p-6 border-2 border-yellow-400/50 bg-gradient-to-r from-yellow-900/30 to-orange-900/30">
           <div className="text-center">
-            <div className="text-6xl mb-4 animate-bounce">🏆</div>
+            <div className="text-6xl mb-4">🏆</div>
             <h3 className="font-orbitron text-xl font-bold text-yellow-300 mb-3">
               GANHADOR SORTEADO!
             </h3>
             <div className="glass-blue p-4 rounded-lg border-2 border-yellow-400/50">
-              <p className="text-lg font-bold text-white mb-1 animate-pulse">
+              <p className="text-lg font-bold text-white mb-1">
                 {ganhador.name}
               </p>
               <p className="text-sm text-yellow-300 font-mono">
                 MESA {ganhador.table}
               </p>
             </div>
-            <div className="flex justify-center gap-2 mt-4 text-2xl">
-              <span className="animate-bounce" style={{animationDelay: '0s'}}>🎉</span>
-              <span className="animate-bounce" style={{animationDelay: '0.1s'}}>🎊</span>
-              <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🎉</span>
-              <span className="animate-bounce" style={{animationDelay: '0.3s'}}>🎊</span>
-              <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🎉</span>
-            </div>
+            
+            {/* Mensagem personalizada baseada se é o ganhador ou não */}
+            {isWinner ? (
+              <div className="mt-4 glass-blue p-3 rounded-lg border border-green-400/50 bg-green-900/20">
+                <p className="text-green-300 font-bold text-sm animate-pulse">
+                  🎉 VOCÊ É O GANHADOR! 🎉
+                </p>
+                <p className="text-xs text-gray-300 mt-1">
+                  Procure o garçom para retirar seu prêmio!
+                </p>
+              </div>
+            ) : (
+              <div className="flex justify-center gap-2 mt-4 text-2xl">
+                <span className="animate-bounce" style={{animationDelay: '0s'}}>🎉</span>
+                <span className="animate-bounce" style={{animationDelay: '0.1s'}}>🎊</span>
+                <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🎉</span>
+                <span className="animate-bounce" style={{animationDelay: '0.3s'}}>🎊</span>
+                <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🎉</span>
+              </div>
+            )}
+            
             <p className="text-gray-300 mt-3 text-sm font-mono">
-              Parabéns! Sorteado entre {participantes.length} participantes!
+              Sorteado entre {participantes.length} participantes!
             </p>
           </div>
         </div>
@@ -293,13 +368,13 @@ export default function Sorteio({ user }) {
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {participantes.map((p, i) => {
               const isCurrentUser = p.name === user.name && p.table === user.table;
-              const isWinner = ganhador && ganhador.name === p.name && ganhador.table === p.table;
+              const isWinnerUser = ganhador && ganhador.name === p.name && ganhador.table === p.table;
               
               return (
                 <div
                   key={i}
                   className={`glass p-3 rounded-lg border transition-all duration-200 ${
-                    isWinner 
+                    isWinnerUser 
                       ? "border-yellow-400/80 bg-yellow-900/30 animate-pulse" 
                       : isCurrentUser 
                       ? "border-cyan-400/50 bg-cyan-900/20" 
@@ -308,17 +383,17 @@ export default function Sorteio({ user }) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0 flex-1">
-                      {isWinner && <span className="text-lg animate-bounce">🏆</span>}
+                      {isWinnerUser && <span className="text-lg animate-bounce">🏆</span>}
                       <span className="font-orbitron font-semibold text-white text-sm truncate">
                         {isCurrentUser ? `${p.name} [VOCÊ]` : p.name}
-                        {isWinner && " 🎉"}
+                        {isWinnerUser && " 🎉"}
                       </span>
-                      {isCurrentUser && !isWinner && (
+                      {isCurrentUser && !isWinnerUser && (
                         <div className="bg-cyan-500/30 px-2 py-1 rounded-full text-xs font-bold text-cyan-300 border border-cyan-400/50 flex-shrink-0">
                           SELF
                         </div>
                       )}
-                      {isWinner && (
+                      {isWinnerUser && (
                         <div className="bg-yellow-500/30 px-2 py-1 rounded-full text-xs font-bold text-yellow-300 border border-yellow-400/50 flex-shrink-0 animate-pulse">
                           GANHADOR!
                         </div>

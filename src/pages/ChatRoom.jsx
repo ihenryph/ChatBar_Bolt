@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "../lib/firebase";
 import { Send } from "lucide-react";
+import { useFirestoreCollection } from "../hooks/useFirestore";
+import { validateMessage, messageLimiter } from "../utils/validation";
+import { debounce } from "../utils/performance";
+import LoadingSpinner from "../components/LoadingSpinner";
 import {
   collection,
   query,
@@ -11,47 +15,62 @@ import {
 } from "firebase/firestore";
 
 export default function ChatRoom({ user, onLogout }) {
-  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    const q = query(collection(db, "messages"), orderBy("timestamp"));
-    let previousLength = 0;
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      const lastMsg = msgs[msgs.length - 1];
-      const isMine =
-        lastMsg?.name?.toLowerCase() === user.name.toLowerCase() &&
-        lastMsg?.table === user.table;
-
-      if (previousLength && msgs.length > previousLength && !isMine) {
-        const audio = new Audio("/notify.mp3");
-        audio.play();
+  
+  // Usar hook otimizado para mensagens
+  const { data: messages, loading, error } = useFirestoreCollection(
+    "messages",
+    [orderBy("timestamp")],
+    {
+      onDataChange: (newMessages) => {
+        // Tocar som apenas para mensagens novas de outros usuários
+        const lastMsg = newMessages[newMessages.length - 1];
+        const isMine = lastMsg?.name?.toLowerCase() === user.name.toLowerCase() && 
+                      lastMsg?.table === user.table;
+        
+        if (lastMsg && !isMine && newMessages.length > messages.length) {
+          const audio = new Audio("/notify.mp3");
+          audio.play().catch(() => {});
+        }
       }
+    }
+  );
 
-      previousLength = msgs.length;
-      setMessages(msgs);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
+  // Debounced scroll to bottom
+  const scrollToBottom = debounce(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, 100);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }, [messages]);
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (newMessage.trim() === "") return;
     
+    // Validar mensagem
+    const validation = validateMessage(newMessage);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
+    }
+    
+    // Rate limiting
+    const userId = `${user.name}_${user.table}`;
+    if (!messageLimiter.isAllowed(userId)) {
+      alert('Muitas mensagens! Aguarde um momento.');
+      return;
+    }
+    
+    setSendingMessage(true);
+    setIsTyping(false);
+    
+    try {
     await addDoc(collection(db, "messages"), {
-      text: newMessage,
+        text: validation.sanitized,
       name: user.name,
       table: user.table,
       timestamp: serverTimestamp(),
@@ -62,6 +81,23 @@ export default function ChatRoom({ user, onLogout }) {
     if (textarea) {
       textarea.style.height = "auto";
     }
+    } catch (error) {
+      console.error("Erro ao enviar mensagem:", error);
+      alert("Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Debounced typing indicator
+  const handleTyping = debounce(() => {
+    setIsTyping(false);
+  }, 1000);
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+    setIsTyping(true);
+    handleTyping();
   };
 
   // Função para lidar com teclas pressionadas
@@ -75,6 +111,14 @@ export default function ChatRoom({ user, onLogout }) {
 
   return (
     <div className="space-y-3">
+      {error && (
+        <div className="glass rounded-xl p-3 border border-red-500/50 bg-red-900/20">
+          <p className="text-red-300 text-sm font-mono text-center">
+            ⚠️ Erro de conexão. Tentando reconectar...
+          </p>
+        </div>
+      )}
+      
       {/* Header do Chat mobile */}
       <div className="glass-blue rounded-xl p-3 text-center">
         {/*<h2 className="font-orbitron text-lg font-bold text-neon mb-1">
@@ -94,6 +138,11 @@ export default function ChatRoom({ user, onLogout }) {
 
       {/* Área de mensagens mobile */}
       <div className="glass-dark rounded-xl p-3 h-[60vh] overflow-y-auto space-y-2">
+        {loading && messages.length === 0 ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner text="Carregando mensagens..." />
+          </div>
+        ) : (
         {messages.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-2 opacity-30">💬</div>
@@ -149,6 +198,22 @@ export default function ChatRoom({ user, onLogout }) {
             );
           })
         )}
+        )}
+        
+        {/* Indicador de digitação */}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="glass p-2 rounded-lg border border-gray-600/30">
+              <div className="flex items-center gap-1">
+                <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce"></div>
+                <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <span className="text-xs text-gray-400 ml-2">digitando...</span>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
 
@@ -159,7 +224,7 @@ export default function ChatRoom({ user, onLogout }) {
             <textarea
               value={newMessage}
               onChange={(e) => {
-                setNewMessage(e.target.value);
+                handleInputChange(e);
                 // Auto-resize do textarea
                 e.target.style.height = 'auto';
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
@@ -168,6 +233,7 @@ export default function ChatRoom({ user, onLogout }) {
               placeholder="Digite sua mensagem..."
               className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed min-h-[44px] max-h-[120px] focus:outline-none text-sm"
               rows={1}
+              disabled={sendingMessage}
               style={{ 
                 fontSize: '16px', // Evita zoom no iOS
                 lineHeight: '1.5'
@@ -178,9 +244,13 @@ export default function ChatRoom({ user, onLogout }) {
           <button 
             type="submit"
             className="btn-futuristic p-3 rounded-lg disabled:opacity-50 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            disabled={!newMessage.trim()}
+            disabled={!newMessage.trim() || sendingMessage}
           >
-            <Send size={16} />
+            {sendingMessage ? (
+              <div className="loading-spinner"></div>
+            ) : (
+              <Send size={16} />
+            )}
           </button>
         </div>
         
@@ -188,7 +258,10 @@ export default function ChatRoom({ user, onLogout }) {
           {/*<span className="font-mono">ENTER para quebra de linha</span>*/}
           <div className="flex items-center gap-1">
             <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
-            <span>ATIVO</span>
+            <span>{sendingMessage ? 'ENVIANDO...' : 'ATIVO'}</span>
+          </div>
+          <div className="text-xs text-gray-500">
+            {messageLimiter.getRemainingRequests(`${user.name}_${user.table}`)} msgs restantes
           </div>
         </div>
       </form>

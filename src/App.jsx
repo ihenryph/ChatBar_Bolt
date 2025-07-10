@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import LoadingSpinner from "./components/LoadingSpinner";
+import ConnectionStatus from "./components/ConnectionStatus";
+import { useUserPresence } from "./hooks/useFirestore";
+import { PerformanceMonitor } from "./utils/performance";
 import ChatRoom from "./pages/ChatRoom";
 import Votacao from "./pages/Votacao";
 import Entry from "./pages/Entry";
@@ -16,6 +21,10 @@ function App() {
   const [user, setUser] = useState(null);
   const [telaAtual, setTelaAtual] = useState("chat");
   const [presenceInterval, setPresenceInterval] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Hook para monitorar conexão
+  const { isOnline } = useUserPresence(user);
 
   // Manter presença ativa quando usuário estiver logado
   useEffect(() => {
@@ -34,6 +43,9 @@ function App() {
   // Função de logout com limpeza completa
   const handleLogout = async () => {
     if (!user) return;
+    
+    setIsLoading(true);
+    PerformanceMonitor.start('logout');
 
     console.log("🚪 Iniciando processo de logout...");
 
@@ -64,18 +76,46 @@ function App() {
     // Fazer logout
     setUser(null);
     setTelaAtual("chat");
+    setIsLoading(false);
+    PerformanceMonitor.end('logout');
   };
 
-  if (!user) return <Entry onEnter={setUser} />;
+  if (!user) {
+    return (
+      <ErrorBoundary>
+        <Entry onEnter={setUser} />
+        <ConnectionStatus />
+      </ErrorBoundary>
+    );
+  }
  
   if (user?.isAdmin) {
-    return <PainelAdmin />; 
+    return (
+      <ErrorBoundary>
+        <PainelAdmin />
+        <ConnectionStatus />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <div className="min-h-screen min-h-dvh text-white relative max-w-md mx-auto bg-black/20">
+    <ErrorBoundary>
+      {isLoading && <LoadingSpinner fullScreen text="Processando..." />}
+      
+      <div className="min-h-screen min-h-dvh text-white relative max-w-md mx-auto bg-black/20">
+        <ConnectionStatus />
+        
+        {/* Indicador de conexão no header */}
+        {!isOnline && (
+          <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-40">
+            <div className="bg-red-600/90 text-white text-center py-2 text-xs font-mono">
+              ⚠️ SEM CONEXÃO - Modo offline
+            </div>
+          </div>
+        )}
+        
       {/* Header e Menu fixos - removido fundo preto e ajustado transparência */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
+        <div className={`fixed left-1/2 transform -translate-x-1/2 w-full max-w-md z-50 ${!isOnline ? 'top-8' : 'top-0'}`}>
         {/* Header futurístico mobile-first */}
         <div className="glass-dark border-b border-cyan-500/30 p-3">
           <div className="text-center mb-3">
@@ -168,8 +208,9 @@ function App() {
               <button
                 className="px-2 py-2 rounded-full text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-all duration-300 text-center"
                 onClick={handleLogout}
+                disabled={isLoading}
               >
-                🚪 Sair
+                {isLoading ? "..." : "🚪 Sair"}
               </button>
             </div>
           </div>
@@ -177,7 +218,7 @@ function App() {
       </div>
 
       {/* Conteúdo principal com padding-top reduzido para compensar o header fixo */}
-      <div className="pt-[120px] p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)]">
+        <div className={`p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)] ${!isOnline ? 'pt-[150px]' : 'pt-[120px]'}`}>
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}
@@ -189,7 +230,8 @@ function App() {
 
       {/* Notificações */}
       <Notificacoes user={user} />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 

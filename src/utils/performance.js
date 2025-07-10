@@ -74,6 +74,7 @@ export function lazyLoad(importFunc, fallback = null) {
     return (
       <React.Suspense fallback={fallback || <div>Carregando...</div>}>
         <LazyComponent {...props} />
+      }
       </React.Suspense>
     );
   };

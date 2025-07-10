@@ -143,7 +143,7 @@ export default function ChatRoom({ user, onLogout }) {
             <LoadingSpinner text="Carregando mensagens..." />
           </div>
         ) : (
-        {messages.length === 0 ? (
+        messages.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-2 opacity-30">💬</div>
             <p className="text-gray-400 text-sm font-mono">AGUARDANDO MENSAGENS...</p>
@@ -197,7 +197,7 @@ export default function ChatRoom({ user, onLogout }) {
               </div>
             );
           })
-        )}
+        )
         )}
         
         {/* Indicador de digitação */}

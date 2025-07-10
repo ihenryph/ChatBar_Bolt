@@ -13,7 +13,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import { PerformanceMonitor } from "./utils/performance.js";
+import { PerformanceMonitor } from "./utils/performance.jsx";
 import './index.css';
 
 // Monitorar tempo de carregamento inicial

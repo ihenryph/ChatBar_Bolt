@@ -111,6 +111,7 @@ export default function Notificacoes({ user }) {
           if (!mensagensRecebidasRef.current.has(msgId)) {
             // Apenas tocar som para mensagens realmente novas
             // A atualização da lista será feita pelo listener principal
+          }
         }
       });
     });
@@ -186,6 +187,7 @@ export default function Notificacoes({ user }) {
       )
     );
   };
+
   return (
     <>
       {/* Notificação de curtida */}

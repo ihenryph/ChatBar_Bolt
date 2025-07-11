@@ -5,14 +5,17 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs
+  getDocs,
+  orderBy,
+  limit
 } from "firebase/firestore";
 import confetti from "canvas-confetti";
 
 export default function Notificacoes({ user }) {
   const [match, setMatch] = useState(null);
   const [curtida, setCurtida] = useState(false);
-  const [mensagemPrivada, setMensagemPrivada] = useState(null);
+  const [mensagensPrivadas, setMensagensPrivadas] = useState([]);
+  const [showMensagensBox, setShowMensagensBox] = useState(false);
   const [drinkRecebido, setDrinkRecebido] = useState(null);
   const curtidasRecebidasRef = useRef(new Set());
   const mensagensRecebidasRef = useRef(new Set());
@@ -53,22 +56,41 @@ export default function Notificacoes({ user }) {
     // Observar mensagens privadas recebidas
     const qMensagens = query(
       collection(db, "mensagens_privadas"), 
-      where("para", "==", user.name)
+      where("para", "==", user.name),
+      orderBy("timestamp", "desc"),
+      limit(10)
     );
     const unsubMensagens = onSnapshot(qMensagens, (snapshot) => {
+      const novasMensagens = [];
+      
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
-          const { de, texto } = change.doc.data();
+          const { de, texto, timestamp } = change.doc.data();
           const msgId = change.doc.id;
           
           if (!mensagensRecebidasRef.current.has(msgId)) {
             mensagensRecebidasRef.current.add(msgId);
             tocarSom();
-            setMensagemPrivada({ de, texto: texto.substring(0, 50) + (texto.length > 50 ? "..." : "") });
-            setTimeout(() => setMensagemPrivada(null), 6000); // some após 6s
+            
+            novasMensagens.push({
+              id: msgId,
+              de,
+              texto: texto.substring(0, 50) + (texto.length > 50 ? "..." : ""),
+              timestamp: timestamp?.toDate?.() || new Date(),
+              isNew: true
+            });
           }
         }
       });
+      
+      // Atualizar lista de mensagens e mostrar box se houver novas mensagens
+      if (novasMensagens.length > 0) {
+        setMensagensPrivadas(prev => {
+          const updated = [...novasMensagens, ...prev.map(msg => ({ ...msg, isNew: false }))];
+          return updated.slice(0, 10); // Manter apenas as 10 mais recentes
+        });
+        setShowMensagensBox(true);
+      }
     });
 
     // Observar drinks recebidos
@@ -130,6 +152,17 @@ export default function Notificacoes({ user }) {
     });
   };
 
+  const fecharMensagensBox = () => {
+    setShowMensagensBox(false);
+  };
+
+  const marcarMensagemComoLida = (msgId) => {
+    setMensagensPrivadas(prev => 
+      prev.map(msg => 
+        msg.id === msgId ? { ...msg, isNew: false } : msg
+      )
+    );
+  };
   return (
     <>
       {/* Notificação de curtida */}
@@ -160,22 +193,66 @@ export default function Notificacoes({ user }) {
         </div>
       )}
 
-      {/* Notificação de mensagem privada */}
-      {mensagemPrivada && (
-        <div className="fixed bottom-4 right-4 glass rounded-lg p-4 shadow-lg z-50 border border-pink-400/50 bg-gradient-to-r from-pink-900/80 to-purple-900/80 max-w-xs">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">💬</div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-pink-300 font-orbitron mb-1">
-                {mensagemPrivada.de}
-              </p>
-              <p className="text-xs text-gray-200 font-mono truncate">
-                {mensagemPrivada.texto}
-              </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Nova mensagem privada
-              </p>
+      {/* Box estática de mensagens privadas */}
+      {showMensagensBox && mensagensPrivadas.length > 0 && (
+        <div className="fixed top-4 right-4 glass-dark rounded-xl p-4 shadow-lg z-40 border border-pink-400/50 bg-gradient-to-r from-pink-900/80 to-purple-900/80 max-w-sm w-80">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="text-xl">💬</div>
+              <h3 className="font-orbitron text-sm font-bold text-pink-300">
+                MENSAGENS PRIVADAS
+              </h3>
             </div>
+            <button
+              onClick={fecharMensagensBox}
+              className="text-gray-400 hover:text-white transition-colors text-lg"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {mensagensPrivadas.map((msg) => (
+              <div
+                key={msg.id}
+                className={`glass p-3 rounded-lg border transition-all duration-200 cursor-pointer hover:bg-pink-900/40 ${
+                  msg.isNew 
+                    ? "border-pink-400/80 bg-pink-900/30 animate-pulse" 
+                    : "border-gray-600/30"
+                }`}
+                onClick={() => marcarMensagemComoLida(msg.id)}
+              >
+                <div className="flex items-start gap-2">
+                  {msg.isNew && (
+                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse flex-shrink-0 mt-1"></div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-bold text-pink-300 font-orbitron truncate">
+                        {msg.de}
+                      </p>
+                      {msg.isNew && (
+                        <span className="bg-pink-500/30 px-1 py-0.5 rounded text-xs font-bold text-pink-300 border border-pink-400/50">
+                          NOVA
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-200 font-mono truncate">
+                      {msg.texto}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {msg.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-3 pt-2 border-t border-gray-600/30">
+            <p className="text-xs text-gray-400 text-center font-mono">
+              💡 Clique em uma mensagem para marcar como lida
+            </p>
           </div>
         </div>
       )}

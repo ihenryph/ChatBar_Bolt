@@ -56,41 +56,63 @@ export default function Notificacoes({ user }) {
     // Observar mensagens privadas recebidas
     const qMensagens = query(
       collection(db, "mensagens_privadas"), 
-      where("para", "==", user.name),
-      orderBy("timestamp", "desc"),
-      limit(10)
+      where("para", "==", user.name)
     );
     const unsubMensagens = onSnapshot(qMensagens, (snapshot) => {
-      const novasMensagens = [];
+      const todasMensagens = [];
       
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const { de, texto, timestamp } = change.doc.data();
-          const msgId = change.doc.id;
-          
-          if (!mensagensRecebidasRef.current.has(msgId)) {
-            mensagensRecebidasRef.current.add(msgId);
-            tocarSom();
-            
-            novasMensagens.push({
-              id: msgId,
-              de,
-              texto: texto.substring(0, 50) + (texto.length > 50 ? "..." : ""),
-              timestamp: timestamp?.toDate?.() || new Date(),
-              isNew: true
-            });
-          }
-        }
+      // Processar todas as mensagens e ordenar no cliente
+      snapshot.docs.forEach((doc) => {
+        const { de, texto, timestamp } = doc.data();
+        const msgId = doc.id;
+        
+        todasMensagens.push({
+          id: msgId,
+          de,
+          texto: texto.substring(0, 50) + (texto.length > 50 ? "..." : ""),
+          timestamp: timestamp?.toDate?.() || new Date(),
+          isNew: !mensagensRecebidasRef.current.has(msgId)
+        });
       });
       
-      // Atualizar lista de mensagens e mostrar box se houver novas mensagens
+      // Ordenar por timestamp (mais recentes primeiro) e limitar a 10
+      const mensagensOrdenadas = todasMensagens
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 10);
+      
+      // Verificar se há mensagens novas
+      const novasMensagens = mensagensOrdenadas.filter(msg => msg.isNew);
+      
       if (novasMensagens.length > 0) {
-        setMensagensPrivadas(prev => {
-          const updated = [...novasMensagens, ...prev.map(msg => ({ ...msg, isNew: false }))];
-          return updated.slice(0, 10); // Manter apenas as 10 mais recentes
+        // Marcar mensagens como recebidas e tocar som
+        novasMensagens.forEach(msg => {
+          mensagensRecebidasRef.current.add(msg.id);
         });
+        tocarSom();
         setShowMensagensBox(true);
       }
+      
+      // Atualizar estado com todas as mensagens
+      setMensagensPrivadas(mensagensOrdenadas.map(msg => ({
+        ...msg,
+        isNew: novasMensagens.some(nova => nova.id === msg.id)
+      })));
+    });
+    
+    // Observar apenas novas mensagens para notificações em tempo real
+    const qNovasMensagens = query(
+      collection(db, "mensagens_privadas"), 
+      where("para", "==", user.name)
+    );
+    const unsubNovasMensagens = onSnapshot(qNovasMensagens, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const msgId = change.doc.id;
+          if (!mensagensRecebidasRef.current.has(msgId)) {
+            // Apenas tocar som para mensagens realmente novas
+            // A atualização da lista será feita pelo listener principal
+        }
+      });
     });
 
     // Observar drinks recebidos
@@ -125,6 +147,7 @@ export default function Notificacoes({ user }) {
     return () => {
       unsubCurtidas();
       unsubMensagens();
+      unsubNovasMensagens();
       unsubDrinks();
     };
   }, [user]);

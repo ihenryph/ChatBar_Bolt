@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy, setDoc } from "firebase/firestore";
+import { gerarURLQRCode } from "../utils/qrCodeUtils";
 
 export default function PainelAdmin() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,6 +11,8 @@ export default function PainelAdmin() {
   const [curtidas, setCurtidas] = useState([]);
   const [votos, setVotos] = useState([]);
   const [drinks, setDrinks] = useState([]);
+  const [qrCodeMesa, setQrCodeMesa] = useState("");
+  const [urlGerada, setUrlGerada] = useState("");
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -128,6 +131,23 @@ export default function PainelAdmin() {
       console.error("Erro ao sortear:", error);
       alert("Erro ao realizar sorteio. Tente novamente.");
     }
+  };
+
+  const handleGerarQRCode = () => {
+    if (!qrCodeMesa || isNaN(qrCodeMesa) || qrCodeMesa < 1 || qrCodeMesa > 999) {
+      alert("Digite um número de mesa válido (1-999)");
+      return;
+    }
+    
+    const url = gerarURLQRCode(qrCodeMesa);
+    setUrlGerada(url);
+    
+    // Copiar para clipboard
+    navigator.clipboard.writeText(url).then(() => {
+      alert(`URL copiada para clipboard!\n${url}`);
+    }).catch(() => {
+      alert(`URL gerada:\n${url}`);
+    });
   };
 
   // Calcular atividade das mesas
@@ -320,6 +340,16 @@ export default function PainelAdmin() {
             </button>
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
+                tela === "qrcode" 
+                  ? "bg-cyan-500/30 text-cyan-300 border border-cyan-400/50" 
+                  : "text-gray-300 bg-gray-800/50 hover:text-white"
+              }`}
+              onClick={() => setTela("qrcode")}
+            >
+              📱 QR CODES
+            </button>
+            <button
+              className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
                 tela === "radar" 
                   ? "bg-purple-500/30 text-purple-300 border border-purple-400/50" 
                   : "text-gray-300 bg-gray-800/50 hover:text-white"
@@ -328,6 +358,10 @@ export default function PainelAdmin() {
             >
               📡 Radar Social
             </button>
+          </div>
+
+          {/* Segunda linha - Funcionalidades secundárias */}
+          <div className="grid grid-cols-3 gap-2">
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
                 tela === "votacao" 
@@ -338,10 +372,6 @@ export default function PainelAdmin() {
             >
               🎵 Votação
             </button>
-          </div>
-
-          {/* Segunda linha - Funcionalidades secundárias */}
-          <div className="grid grid-cols-3 gap-2">
             <button
               className={`px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-glow text-center ${
                 tela === "drinks" 
@@ -499,6 +529,147 @@ export default function PainelAdmin() {
                       ... e mais {usuarios.length - 8} usuários
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Seção de QR Codes */}
+        {tela === "qrcode" && (
+          <div className="space-y-4">
+            {/* Gerador de QR Code */}
+            <div className="glass-dark rounded-xl p-4 border border-cyan-500/30">
+              <h2 className="font-orbitron font-bold text-cyan-300 mb-4 text-center text-sm">
+                📱 GERADOR DE QR CODES
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono text-gray-400 mb-2">
+                    NÚMERO DA MESA
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={qrCodeMesa}
+                      onChange={(e) => setQrCodeMesa(e.target.value)}
+                      placeholder="Ex: 5"
+                      className="input-futuristic flex-1 p-3 rounded-lg text-sm"
+                    />
+                    <button
+                      onClick={handleGerarQRCode}
+                      className="btn-futuristic px-4 py-3 rounded-lg text-xs"
+                      disabled={!qrCodeMesa}
+                    >
+                      🔗 GERAR URL
+                    </button>
+                  </div>
+                </div>
+
+                {urlGerada && (
+                  <div className="glass-blue rounded-lg p-4 border border-cyan-400/50">
+                    <h3 className="font-orbitron font-bold text-cyan-300 mb-2 text-xs">
+                      ✅ URL GERADA PARA MESA {qrCodeMesa}
+                    </h3>
+                    
+                    <div className="glass p-3 rounded-lg border border-gray-600/30 mb-3">
+                      <p className="text-xs text-gray-300 font-mono break-all">
+                        {urlGerada}
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(urlGerada)}
+                        className="btn-futuristic flex-1 py-2 text-xs"
+                      >
+                        📋 COPIAR URL
+                      </button>
+                      <button
+                        onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlGerada)}`, '_blank')}
+                        className="btn-futuristic bg-gradient-to-r from-green-600 to-emerald-600 flex-1 py-2 text-xs"
+                      >
+                        📱 VER QR CODE
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Instruções */}
+            <div className="glass-dark rounded-xl p-4 border border-purple-500/30">
+              <h3 className="font-orbitron font-bold text-purple-300 mb-3 text-sm">
+                📋 INSTRUÇÕES DE USO
+              </h3>
+              
+              <div className="space-y-3 text-xs text-gray-300 font-mono">
+                <div className="glass p-3 rounded-lg">
+                  <p className="text-cyan-300 font-bold mb-1">1. GERAR URL</p>
+                  <p>Digite o número da mesa e clique em "GERAR URL"</p>
+                </div>
+                
+                <div className="glass p-3 rounded-lg">
+                  <p className="text-green-300 font-bold mb-1">2. CRIAR QR CODE</p>
+                  <p>Clique em "VER QR CODE" para gerar o código QR</p>
+                </div>
+                
+                <div className="glass p-3 rounded-lg">
+                  <p className="text-yellow-300 font-bold mb-1">3. IMPRIMIR</p>
+                  <p>Salve a imagem e imprima para colocar na mesa</p>
+                </div>
+                
+                <div className="glass p-3 rounded-lg">
+                  <p className="text-pink-300 font-bold mb-1">4. FUNCIONAMENTO</p>
+                  <p>Clientes escaneiam o QR e a mesa é preenchida automaticamente</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mesas Ativas */}
+            <div className="glass-dark rounded-xl p-4 border border-green-500/30">
+              <h3 className="font-orbitron font-bold text-green-300 mb-3 text-sm">
+                🎯 MESAS COM USUÁRIOS ATIVOS
+              </h3>
+              
+              {usuarios.length === 0 ? (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-2 opacity-30">🏪</div>
+                  <p className="text-gray-400 text-xs font-mono">NENHUMA MESA ATIVA</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {[...new Set(usuarios.map(u => u.table))]
+                    .sort((a, b) => parseInt(a) - parseInt(b))
+                    .map(mesa => {
+                      const usuariosMesa = usuarios.filter(u => u.table === mesa);
+                      return (
+                        <div key={mesa} className="glass p-3 rounded-lg border border-gray-600/30">
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-white mb-1">
+                              MESA {mesa}
+                            </div>
+                            <div className="text-xs text-gray-300">
+                              {usuariosMesa.length} {usuariosMesa.length === 1 ? 'usuário' : 'usuários'}
+                            </div>
+                            <div className="flex justify-center mt-2">
+                              <button
+                                onClick={() => {
+                                  const url = gerarURLQRCode(mesa);
+                                  window.open(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`, '_blank');
+                                }}
+                                className="btn-futuristic px-3 py-1 text-xs"
+                              >
+                                📱 QR
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               )}
             </div>

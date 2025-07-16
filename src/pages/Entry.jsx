@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { registrarPresencaUsuario } from "../utils/userPresence";
-// import { verificarEntradaViaQRCode, limparParametrosQRCode, validarMesa } from "../utils/qrCodeUtils";
-// import QRCodeScanner from "../components/QRCodeScanner";
+import { verificarEntradaViaQRCode, limparParametrosQRCode, validarMesa } from "../utils/qrCodeUtils";
+import QRCodeScanner from "../components/QRCodeScanner";
 
 export default function Entry({ onEnter }) {
   const [name, setName] = useState("");
@@ -11,19 +11,19 @@ export default function Entry({ onEnter }) {
   const [status, setStatus] = useState("");
   const [adminCode, setAdminCode] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [showQRScanner, setShowQRScanner] = useState(false);
-  // const [qrDetected, setQrDetected] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [qrDetected, setQrDetected] = useState(false);
 
-  // Verificar se chegou via QR Code - COMENTADO
-  // useEffect(() => {
-  //   const dadosQR = verificarEntradaViaQRCode();
-  //   if (dadosQR) {
-  //     setTable(dadosQR.mesa);
-  //     setQrDetected(true);
-  //     limparParametrosQRCode();
-  //     console.log("🔍 Entrada via QR Code detectada - Mesa:", dadosQR.mesa);
-  //   }
-  // }, []);
+  // Verificar se chegou via QR Code
+  useEffect(() => {
+    const dadosQR = verificarEntradaViaQRCode();
+    if (dadosQR) {
+      setTable(dadosQR.mesa);
+      setQrDetected(true);
+      limparParametrosQRCode();
+      console.log("🔍 Entrada via QR Code detectada - Mesa:", dadosQR.mesa);
+    }
+  }, []);
 
   const handleAdminLogin = () => {
     if (adminCode === "admin123") {
@@ -35,11 +35,10 @@ export default function Entry({ onEnter }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !table || !status) return;
+    if (!name || !status) return;
 
-    // Validar mesa - validação simples sem QR Code utils
-    const numero = parseInt(table);
-    if (isNaN(numero) || numero < 1 || numero > 999) {
+    // Validar mesa se não veio do QR Code
+    if (!qrDetected && (!table || !validarMesa(table))) {
       alert("Número da mesa deve ser entre 1 e 999");
       return;
     }
@@ -47,6 +46,11 @@ export default function Entry({ onEnter }) {
     setLoading(true);
 
     try {
+      // Se não tem mesa definida (não veio do QR), exigir
+      if (!table) {
+        alert("Mesa é obrigatória. Use o QR Code ou digite o número.");
+        return;
+      }
       const userData = { name, table, status };
 
       // Salvar no Firestore
@@ -56,7 +60,7 @@ export default function Entry({ onEnter }) {
         status,
         timestamp: serverTimestamp(),
         online: true,
-        // entradaViaQR: qrDetected // COMENTADO
+        entradaViaQR: qrDetected
       });
 
       // Registrar presença instantânea em todas as coleções
@@ -74,31 +78,31 @@ export default function Entry({ onEnter }) {
     }
   };
 
-  // Funções QR Code - COMENTADAS
-  // const handleQRScanSuccess = (dadosQR) => {
-  //   if (dadosQR && dadosQR.mesa) {
-  //     setTable(dadosQR.mesa);
-  //     setQrDetected(true);
-  //     setShowQRScanner(false);
-  //     console.log("✅ QR Code processado - Mesa:", dadosQR.mesa);
-  //   }
-  // };
+  // Funções QR Code
+  const handleQRScanSuccess = (dadosQR) => {
+    if (dadosQR && dadosQR.mesa) {
+      setTable(dadosQR.mesa);
+      setQrDetected(true);
+      setShowQRScanner(false);
+      console.log("✅ QR Code processado - Mesa:", dadosQR.mesa);
+    }
+  };
 
-  // const handleQRScanError = (error) => {
-  //   console.error("❌ Erro no scanner QR:", error);
-  //   setShowQRScanner(false);
-  // };
+  const handleQRScanError = (error) => {
+    console.error("❌ Erro no scanner QR:", error);
+    setShowQRScanner(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 relative">
-      {/* Scanner QR Code - COMENTADO */}
-      {/* {showQRScanner && (
+      {/* Scanner QR Code */}
+      {showQRScanner && (
         <QRCodeScanner
           onScanSuccess={handleQRScanSuccess}
           onScanError={handleQRScanError}
           onClose={() => setShowQRScanner(false)}
         />
-      )} */}
+      )}
 
       {/* Efeito de partículas flutuantes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -129,8 +133,8 @@ export default function Entry({ onEnter }) {
           </p>
         </div>
 
-        {/* Alerta QR Code detectado - COMENTADO */}
-        {/* {qrDetected && (
+        {/* Alerta QR Code detectado */}
+        {qrDetected && (
           <div className="glass-blue rounded-lg p-3 mb-4 border border-cyan-400/50">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-lg">📱</span>
@@ -140,7 +144,7 @@ export default function Entry({ onEnter }) {
               Mesa {table} selecionada automaticamente
             </p>
           </div>
-        )} */}
+        )}
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -160,17 +164,30 @@ export default function Entry({ onEnter }) {
             </div>
 
             <div className="relative">
-              {/* Removido botão QR Code */}
               <input
                 type="text"
                 placeholder="Mesa"
                 className="input-futuristic w-full p-3 rounded-xl font-medium"
                 value={table}
                 onChange={(e) => setTable(e.target.value)}
-                disabled={loading}
+                disabled={loading || qrDetected}
               />
+              
+              {!qrDetected && (
+                <button
+                  type="button"
+                  onClick={() => setShowQRScanner(true)}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 glass p-2 rounded-lg hover-glow transition-all duration-200"
+                  disabled={loading}
+                >
+                  <span className="text-lg">📱</span>
+                </button>
+              )}
+              
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full pulse-glow"></div>
+                <div className={`w-2 h-2 rounded-full ${
+                  qrDetected ? 'bg-green-400 animate-pulse' : 'bg-cyan-400 pulse-glow'
+                }`}></div>
               </div>
             </div>
 
@@ -197,7 +214,7 @@ export default function Entry({ onEnter }) {
           <button
             type="submit"
             className="btn-futuristic w-full py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading}
+            disabled={loading || !name || !status}
           >
             {loading ? (
               <div className="flex items-center justify-center gap-2">
@@ -248,12 +265,12 @@ export default function Entry({ onEnter }) {
           </div>
         </div>
 
-        {/* Info sobre QR Code - COMENTADO */}
-        {/* <div className="mt-4 text-center">
+        {/* Info sobre QR Code */}
+        <div className="mt-4 text-center">
           <p className="text-xs text-gray-500 font-mono">
             💡 Use o botão 📱 para escanear o QR Code da mesa
           </p>
-        </div> */}
+        </div>
       </div>
 
       {/* Rodapé futurístico */}

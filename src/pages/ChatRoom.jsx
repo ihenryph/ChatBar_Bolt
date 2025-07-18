@@ -137,7 +137,7 @@ export default function ChatRoom({ user, onLogout }) {
       </div>
 
       {/* Área de mensagens mobile */}
-      <div className="glass-dark rounded-xl p-3 h-[60vh] overflow-y-auto space-y-2">
+      <div className="glass-dark rounded-xl p-3 h-[calc(100vh-280px)] h-[calc(100dvh-280px)] overflow-y-auto space-y-2">
         {loading && messages.length === 0 ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner text="Carregando mensagens..." />
@@ -217,54 +217,5 @@ export default function ChatRoom({ user, onLogout }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input de mensagem mobile otimizado */}
-      <form onSubmit={handleSend} className="glass-dark rounded-xl p-3">
-        <div className="flex gap-2 items-end">
-          <div className="flex-1">
-            <textarea
-              value={newMessage}
-              onChange={(e) => {
-                handleInputChange(e);
-                // Auto-resize do textarea
-                e.target.style.height = 'auto';
-                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Digite sua mensagem..."
-              className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed min-h-[44px] max-h-[120px] focus:outline-none text-sm"
-              rows={1}
-              disabled={sendingMessage}
-              style={{ 
-                fontSize: '16px', // Evita zoom no iOS
-                lineHeight: '1.5'
-              }}
-            />
-          </div>
-          
-          <button 
-            type="submit"
-            className="btn-futuristic p-3 rounded-lg disabled:opacity-50 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            disabled={!newMessage.trim() || sendingMessage}
-          >
-            {sendingMessage ? (
-              <div className="loading-spinner"></div>
-            ) : (
-              <Send size={16} />
-            )}
-          </button>
-        </div>
-        
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
-          {/*<span className="font-mono">ENTER para quebra de linha</span>*/}
-          <div className="flex items-center gap-1">
-            <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
-            <span>{sendingMessage ? 'ENVIANDO...' : 'ATIVO'}</span>
-          </div>
-          <div className="text-xs text-gray-500">
-            {messageLimiter.getRemainingRequests(`${user.name}_${user.table}`)} msgs restantes
-          </div>
-        </div>
-      </form>
     </div>
   );
-}

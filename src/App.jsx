@@ -218,7 +218,7 @@ function App() {
       </div>
 
       {/* Conteúdo principal com padding-top reduzido para compensar o header fixo */}
-        <div className={`p-3 pb-20 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)] ${!isOnline ? 'pt-[150px]' : 'pt-[120px]'}`}>
+        <div className={`p-3 pb-32 relative z-10 min-h-[calc(100vh-120px)] min-h-[calc(100dvh-120px)] ${!isOnline ? 'pt-[150px]' : 'pt-[120px]'}`}>
         {telaAtual === "chat" && <ChatRoom user={user} />}
         {telaAtual === "votacao" && <Votacao user={user} />}
         {telaAtual === "radar" && <RadarSocial user={user} />}
@@ -227,6 +227,15 @@ function App() {
         {telaAtual === "perfil" && (<Profile user={user} onBack={() => setTelaAtual("chat")}/>)}
         {telaAtual === "paquera" && <Paquera user={user} />}
       </div>
+
+      {/* Área fixa para input de mensagem no chat */}
+      {telaAtual === "chat" && (
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-40 bg-black/80 backdrop-blur-sm border-t border-cyan-500/30">
+          <div id="chat-input-area" className="p-3">
+            {/* O input será renderizado aqui pelo ChatRoom */}
+          </div>
+        </div>
+      )}
 
       {/* Notificações */}
       <Notificacoes user={user} />

@@ -109,7 +109,7 @@ export default function ChatRoom({ user, onLogout }) {
     // A mensagem só será enviada clicando no botão
   };
 
-  return (
+  const chatContent = (
     <div className="space-y-3">
       {error && (
         <div className="glass rounded-xl p-3 border border-red-500/50 bg-red-900/20">
@@ -219,3 +219,91 @@ export default function ChatRoom({ user, onLogout }) {
 
     </div>
   );
+
+  // Renderizar input fixo na parte inferior
+  useEffect(() => {
+    const inputArea = document.getElementById('chat-input-area');
+    if (inputArea) {
+      const inputForm = (
+        <form onSubmit={handleSend} className="glass-dark rounded-xl p-3">
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <textarea
+                value={newMessage}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  // Auto-resize do textarea
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="Digite sua mensagem..."
+                className="input-futuristic w-full px-3 py-2 rounded-lg resize-none overflow-hidden leading-relaxed min-h-[44px] max-h-[120px] focus:outline-none text-sm"
+                rows={1}
+                disabled={sendingMessage}
+                style={{ 
+                  fontSize: '16px', // Evita zoom no iOS
+                  lineHeight: '1.5'
+                }}
+              />
+            </div>
+            
+            <button 
+              type="submit"
+              className="btn-futuristic p-3 rounded-lg disabled:opacity-50 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              disabled={!newMessage.trim() || sendingMessage}
+            >
+              {sendingMessage ? (
+                <div className="loading-spinner"></div>
+              ) : (
+                <Send size={16} />
+              )}
+            </button>
+          </div>
+          
+          <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
+            <div className="flex items-center gap-1">
+              <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+              <span>{sendingMessage ? 'ENVIANDO...' : 'ATIVO'}</span>
+            </div>
+            <div className="text-xs text-gray-500">
+              {messageLimiter.getRemainingRequests(`${user.name}_${user.table}`)} msgs restantes
+            </div>
+          </div>
+        </form>
+      );
+      
+      // Renderizar o formulário no container fixo
+      inputArea.innerHTML = '';
+      const formElement = document.createElement('div');
+      formElement.innerHTML = inputForm;
+      inputArea.appendChild(formElement.firstChild);
+      
+      // Adicionar event listeners
+      const form = inputArea.querySelector('form');
+      const textarea = inputArea.querySelector('textarea');
+      const button = inputArea.querySelector('button[type="submit"]');
+      
+      if (form && textarea && button) {
+        form.addEventListener('submit', handleSend);
+        textarea.addEventListener('input', (e) => {
+          handleInputChange(e);
+          e.target.style.height = 'auto';
+          e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+        });
+        textarea.addEventListener('keydown', handleKeyDown);
+        textarea.value = newMessage;
+      }
+    }
+    
+    // Cleanup
+    return () => {
+      const inputArea = document.getElementById('chat-input-area');
+      if (inputArea) {
+        inputArea.innerHTML = '';
+      }
+    };
+  }, [newMessage, sendingMessage, user]);
+
+  return chatContent;
+}

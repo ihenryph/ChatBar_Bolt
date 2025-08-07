@@ -1,1 +1,12 @@
-{"code":"rate-limited","message":"You have hit the rate limit. Please upgrade to keep chatting.","providerLimitHit":false,"isRetryable":true}
+import React from 'react';
+
+const ChatRoom = () => {
+  return (
+    <div className="chat-room">
+      <h1>Chat Room</h1>
+      <p>Welcome to the chat room!</p>
+    </div>
+  );
+};
+
+export default ChatRoom;
